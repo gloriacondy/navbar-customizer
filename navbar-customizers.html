@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&family=Inter:wght@400;500&family=Playfair+Display:wght@400;500&family=Lora:wght@400;500&family=Space+Grotesk:wght@400;500&family=Syne:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;color:#222;}
-.app{display:flex;border:1px solid #c8ccd2;border-radius:14px;overflow:hidden;margin:16px;}
+html,body{height:100%;background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:#222;}
+.app{display:flex;width:100%;min-height:100%;border:1px solid #c8ccd2;border-radius:12px;overflow:hidden;}
 .sidebar{width:330px;flex-shrink:0;background:#eef0f3;border-right:1px solid #c8ccd2;display:flex;flex-direction:column;}
 .sidebar-title{font-size:10px;font-weight:500;color:#888;padding:14px 18px 12px;border-bottom:1px solid #dde0e5;letter-spacing:0.08em;text-transform:uppercase;}
 .sidebar-inner{padding:16px 18px;}
@@ -64,25 +64,20 @@ html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;col
   <div class="sidebar">
     <div class="sidebar-title">Navbar customizer</div>
     <div class="sidebar-inner">
-
       <div class="sec">
         <h3>Container</h3>
         <div class="row"><label>Background</label><div class="hx"><input type="color" id="a1" value="#f0f0f0"><input type="text" id="a2" value="#f0f0f0" maxlength="7"></div></div>
         <div class="row"><label>Roundness</label><input type="range" id="b1" min="0" max="40" step="1" value="40"><span class="vl" id="b2">40</span></div>
         <div class="row"><label>Padding</label><input type="range" id="c1" min="2" max="16" step="1" value="5"><span class="vl" id="c2">5</span></div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Active pill</h3>
         <div class="row"><label>Background</label><div class="hx"><input type="color" id="d1" value="#ffffff"><input type="text" id="d2" value="#ffffff" maxlength="7"></div></div>
         <div class="row"><label>Roundness</label><input type="range" id="e1" min="0" max="40" step="1" value="40"><span class="vl" id="e2">40</span></div>
         <div class="row"><label>Text color</label><div class="hx"><input type="color" id="f1" value="#111111"><input type="text" id="f2" value="#111111" maxlength="7"></div></div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Brand</h3>
         <div class="row"><label>Name</label><input class="ti" type="text" id="g1" value="Cubed"></div>
@@ -92,17 +87,13 @@ html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;col
         <div class="row"><label>Font size</label><input type="range" id="i1" min="11" max="24" step="1" value="16"><span class="vl" id="i2">16</span></div>
         <div class="row"><label>Color</label><div class="hx"><input type="color" id="j1" value="#111111"><input type="text" id="j2" value="#111111" maxlength="7"></div></div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Links</h3>
         <div class="row"><label>Font size</label><input type="range" id="k1" min="10" max="18" step="1" value="11"><span class="vl" id="k2">11</span></div>
         <div class="row"><label>Color</label><div class="hx"><input type="color" id="l1" value="#111111"><input type="text" id="l2" value="#111111" maxlength="7"></div></div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Font</h3>
         <div class="row"><label>Font</label>
@@ -119,9 +110,7 @@ html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;col
           </select>
         </div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Behaviour</h3>
         <div class="toggle-row">
@@ -129,22 +118,18 @@ html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;col
           <label class="toggle"><input type="checkbox" id="sticky" checked><span class="slider-tog"></span></label>
         </div>
       </div>
-
       <hr class="dv">
-
       <div class="sec">
         <h3>Pages</h3>
         <div id="plist"></div>
         <button class="ab" id="addp">+ add page</button>
       </div>
-
     </div>
     <div class="sidebar-footer">
       <button class="btn-reset" id="rst">Reset</button>
       <button class="btn-export" id="exp">Export code</button>
     </div>
   </div>
-
   <div class="preview-pane">
     <div class="preview-area">
       <div class="pnav" id="pnav"></div>
@@ -158,33 +143,18 @@ html,body{background:#e8eaed;font-family:'DM Sans',sans-serif;font-size:13px;col
     </div>
   </div>
 </div>
-
 <script>
-var FONTS={
-  "'DM Mono', monospace":"https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap",
-  "'DM Sans', sans-serif":"https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap",
-  "'Inter', sans-serif":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap",
-  "'Playfair Display', serif":"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap",
-  "'Lora', serif":"https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap",
-  "'Space Grotesk', sans-serif":"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap",
-  "'Syne', sans-serif":"https://fonts.googleapis.com/css2?family=Syne:wght@400;500&display=swap",
-  "'Outfit', sans-serif":"https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&display=swap"
-};
+var FONTS={"'DM Mono', monospace":"https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap","'DM Sans', sans-serif":"https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap","'Inter', sans-serif":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap","'Playfair Display', serif":"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap","'Lora', serif":"https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap","'Space Grotesk', sans-serif":"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap","'Syne', sans-serif":"https://fonts.googleapis.com/css2?family=Syne:wght@400;500&display=swap","'Outfit', sans-serif":"https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&display=swap"};
 var D={a:'#f0f0f0',b:40,c:5,d:'#ffffff',e:40,f:'#111111',g1:'Cubed',g2:'/',g3:'',h:24,i:16,j:'#111111',k:11,l:'#111111',font:"'DM Mono', monospace",sticky:true,pages:[{l:'Plugins',h:'/'},{l:'About',h:'/about'},{l:'Contact',h:'/contact'},{l:'Cart',h:'/cart'}]};
 var S=JSON.parse(JSON.stringify(D));
-
 function q(id){return document.getElementById(id);}
-function cp(ci,hi,sk){
-  q(ci).oninput=function(){q(hi).value=this.value;S[sk]=this.value;render();};
-  q(hi).oninput=function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))q(ci).value=this.value;S[sk]=this.value;render();};
-}
+function cp(ci,hi,sk){q(ci).oninput=function(){q(hi).value=this.value;S[sk]=this.value;render();};q(hi).oninput=function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))q(ci).value=this.value;S[sk]=this.value;render();};}
 function rn(ri,vi,sk){q(ri).oninput=function(){q(vi).textContent=this.value;S[sk]=+this.value;render();};}
 cp('a1','a2','a');cp('d1','d2','d');cp('f1','f2','f');cp('j1','j2','j');cp('l1','l2','l');
 rn('b1','b2','b');rn('c1','c2','c');rn('e1','e2','e');rn('h1','h2','h');rn('i1','i2','i');rn('k1','k2','k');
 ['g1','g2','g3'].forEach(function(id){q(id).oninput=function(){S[id]=this.value;render();};});
 q('fontpick').onchange=function(){S.font=this.value;render();};
 q('sticky').onchange=function(){S.sticky=this.checked;render();};
-
 function renderPages(){
   var el=q('plist');el.innerHTML='';
   S.pages.forEach(function(p,i){
@@ -195,9 +165,7 @@ function renderPages(){
   el.querySelectorAll('input').forEach(function(x){x.oninput=function(){S.pages[this.dataset.i][this.dataset.f]=this.value;render();};});
   el.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){S.pages.splice(+this.dataset.d,1);renderPages();render();};});
 }
-
 function getFont(){return S.font==='use-squarespace'?'inherit':S.font;}
-
 function render(){
   var nav=q('pnav');
   nav.style.cssText='display:inline-flex;align-items:center;gap:2px;background:'+S.a+';border-radius:'+S.b+'px;padding:'+S.c+'px '+(S.c+1)+'px;';
@@ -213,9 +181,7 @@ function render(){
     nav.appendChild(a);
   });
 }
-
 q('addp').onclick=function(){S.pages.push({l:'New Page',h:'/new'});renderPages();render();};
-
 q('rst').onclick=function(){
   S=JSON.parse(JSON.stringify(D));
   q('a1').value=S.a;q('a2').value=S.a;q('d1').value=S.d;q('d2').value=S.d;
@@ -229,70 +195,27 @@ q('rst').onclick=function(){
   q('cpanel').style.display='none';
   renderPages();render();
 };
-
 function generateCode(){
-  var font=S.font;
-  var isSquarespace=font==='use-squarespace';
-  var ff=isSquarespace?'inherit':font;
+  var font=S.font,isSquarespace=font==='use-squarespace',ff=isSquarespace?'inherit':font;
   var importLine=(!isSquarespace&&FONTS[font])?'@import url(\''+FONTS[font]+'\');\n\n':'';
   var ps=S.pages.map(function(p){return '    <a class="pnav-link" href="'+p.h+'">'+p.l+'</a>';}).join('\n');
   var br=S.g3?'<a id="pnav-brand" href="'+S.g2+'"><img src="'+S.g3+'" style="height:'+S.h+'px;width:auto;display:block;" alt="'+S.g1+'"></a>':'<a id="pnav-brand" href="'+S.g2+'">'+S.g1+'</a>';
   var position=S.sticky?'fixed':'absolute';
   var bodyPad=S.sticky?'body { padding-top: 72px !important; }\n\n':'';
-  return '<style>\n'+importLine+
-'header.header,\n.header-nav,\n.header-actions,\n.header-branding,\n.header-title-nav,\n.header-announcement-bar-wrapper,\n.site-navigation,\n#header { display: none !important; }\n\n'+
-'.Site { padding-top: 0 !important; }\n.sqs-layout .sqs-row { margin-top: 0 !important; }\n\n'+
-bodyPad+
-'#pill-nav-wrapper {\n  position: '+position+';\n  top: 16px;\n  left: 0;\n  right: 0;\n  display: flex;\n  justify-content: center;\n  z-index: 9999;\n  pointer-events: none;\n}\n\n'+
-'#pill-nav-inner {\n  display: inline-flex;\n  align-items: center;\n  background: '+S.a+';\n  border-radius: '+S.b+'px;\n  padding: '+S.c+'px '+(S.c+1)+'px;\n  gap: 2px;\n  pointer-events: all;\n}\n\n'+
-'#pnav-brand {\n  font-family: '+ff+';\n  font-size: '+S.i+'px;\n  font-weight: 500;\n  color: '+S.j+';\n  text-decoration: none;\n  padding: 7px 16px 7px 10px;\n  white-space: nowrap;\n}\n\n'+
-'#pnav-brand:hover { color: '+S.j+'; text-decoration: none; }\n\n'+
-'.pnav-link {\n  font-family: '+ff+';\n  font-size: '+S.k+'px;\n  font-weight: 400;\n  padding: 6px 14px;\n  color: '+S.l+';\n  text-decoration: none;\n  border-radius: '+S.e+'px;\n  white-space: nowrap;\n}\n\n'+
-'.pnav-link:hover { opacity: 0.6; text-decoration: none; }\n\n'+
-'.pnav-link.active {\n  background: '+S.d+';\n  color: '+S.f+';\n}\n'+
-'</style>\n\n'+
-'<div id="pill-nav-wrapper">\n  <div id="pill-nav-inner">\n    '+br+'\n'+ps+'\n  </div>\n</div>\n\n'+
-'<script>\ndocument.addEventListener(\'DOMContentLoaded\', function() {\n'+
-'  var path = window.location.pathname;\n'+
-'  var links = document.querySelectorAll(\'.pnav-link\');\n'+
-'  var matched = false;\n'+
-'  links.forEach(function(link) {\n'+
-'    var href = link.getAttribute(\'href\');\n'+
-'    if (path === href || (href !== \'/\' && path.startsWith(href + \'/\'))) {\n'+
-'      link.classList.add(\'active\');\n      matched = true;\n    }\n  });\n'+
-'  if (!matched) links[0].classList.add(\'active\');\n'+
-'  try {\n    var title = window.Static.SQUARESPACE_CONTEXT.website.siteTitle;\n    if (title) document.getElementById(\'pnav-brand\').textContent = title;\n  } catch(e) {}\n});\n'+
-'<\/script>';
+  return '<style>\n'+importLine+'header.header,\n.header-nav,\n.header-actions,\n.header-branding,\n.header-title-nav,\n.header-announcement-bar-wrapper,\n.site-navigation,\n#header { display: none !important; }\n\n.Site { padding-top: 0 !important; }\n.sqs-layout .sqs-row { margin-top: 0 !important; }\n\n'+bodyPad+'#pill-nav-wrapper {\n  position: '+position+';\n  top: 16px;\n  left: 0;\n  right: 0;\n  display: flex;\n  justify-content: center;\n  z-index: 9999;\n  pointer-events: none;\n}\n\n#pill-nav-inner {\n  display: inline-flex;\n  align-items: center;\n  background: '+S.a+';\n  border-radius: '+S.b+'px;\n  padding: '+S.c+'px '+(S.c+1)+'px;\n  gap: 2px;\n  pointer-events: all;\n}\n\n#pnav-brand {\n  font-family: '+ff+';\n  font-size: '+S.i+'px;\n  font-weight: 500;\n  color: '+S.j+';\n  text-decoration: none;\n  padding: 7px 16px 7px 10px;\n  white-space: nowrap;\n}\n\n#pnav-brand:hover { color: '+S.j+'; text-decoration: none; }\n\n.pnav-link {\n  font-family: '+ff+';\n  font-size: '+S.k+'px;\n  font-weight: 400;\n  padding: 6px 14px;\n  color: '+S.l+';\n  text-decoration: none;\n  border-radius: '+S.e+'px;\n  white-space: nowrap;\n}\n\n.pnav-link:hover { opacity: 0.6; text-decoration: none; }\n\n.pnav-link.active {\n  background: '+S.d+';\n  color: '+S.f+';\n}\n</style>\n\n<div id="pill-nav-wrapper">\n  <div id="pill-nav-inner">\n    '+br+'\n'+ps+'\n  </div>\n</div>\n\n<script>\ndocument.addEventListener(\'DOMContentLoaded\', function() {\n  var path = window.location.pathname;\n  var links = document.querySelectorAll(\'.pnav-link\');\n  var matched = false;\n  links.forEach(function(link) {\n    var href = link.getAttribute(\'href\');\n    if (path === href || (href !== \'/\' && path.startsWith(href + \'/\'))) {\n      link.classList.add(\'active\');\n      matched = true;\n    }\n  });\n  if (!matched) links[0].classList.add(\'active\');\n  try {\n    var title = window.Static.SQUARESPACE_CONTEXT.website.siteTitle;\n    if (title) document.getElementById(\'pnav-brand\').textContent = title;\n  } catch(e) {}\n});\n<\/script>';
 }
-
-q('exp').onclick=function(){
-  var code=generateCode();
-  q('cbox').textContent=code;
-  q('cpanel').style.display='flex';
-};
-
+q('exp').onclick=function(){q('cbox').textContent=generateCode();q('cpanel').style.display='flex';};
 q('copybtn').onclick=function(){
   var code=generateCode();
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(code).then(function(){
-      q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');
-      setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);
-    }).catch(function(){fallbackCopy(code);});
+    navigator.clipboard.writeText(code).then(function(){q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);}).catch(function(){fallbackCopy(code);});
   } else {fallbackCopy(code);}
 };
-
 function fallbackCopy(text){
-  var ta=document.createElement('textarea');
-  ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{
-    document.execCommand('copy');
-    q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');
-    setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);
-  }catch(e){alert('Please select all text in the box and copy manually.');}
+  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);}catch(e){alert('Please select all text in the box and copy manually.');}
   document.body.removeChild(ta);
 }
-
 renderPages();render();
 </script>
 </body>
