@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navbar Customizer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&family=Inter:wght@400;500&family=Playfair+Display:wght@400;500&family=Lora:wght@400;500&family=Space+Grotesk:wght@400;500&family=Syne:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:#222;}
+.app{display:flex;width:100%;min-height:100%;border:1px solid #c8ccd2;border-radius:12px;overflow:hidden;}
+.sidebar{width:330px;flex-shrink:0;background:#eef0f3;border-right:1px solid #c8ccd2;display:flex;flex-direction:column;}
+.sidebar-title{font-size:10px;font-weight:500;color:#888;padding:14px 18px 12px;border-bottom:1px solid #dde0e5;letter-spacing:0.08em;text-transform:uppercase;}
+.sidebar-inner{padding:16px 18px;}
+.sec{margin-bottom:14px;}
+.sec h3{font-size:10px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.row:last-child{margin-bottom:0;}
+.row label{font-size:11.5px;color:#666;width:88px;flex-shrink:0;}
+.hx{display:flex;align-items:center;gap:5px;flex:1;}
+.hx input[type=color]{width:30px;height:26px;padding:2px;border:1px solid #d0d3d8;border-radius:6px;cursor:pointer;background:#fff;flex-shrink:0;}
+.hx input[type=text]{flex:1;font-size:11px;font-family:'DM Mono',monospace;height:26px;padding:0 7px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;color:#111;}
+.row input[type=range]{flex:1;accent-color:#444;}
+.vl{font-size:11px;color:#aaa;width:24px;text-align:right;flex-shrink:0;}
+.ti{flex:1;font-size:11.5px;height:26px;padding:0 8px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;color:#111;}
+.ti:focus,.hx input:focus,.sel:focus{outline:none;border-color:#999;}
+.sel{flex:1;font-size:11.5px;height:26px;padding:0 7px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;color:#111;cursor:pointer;}
+.pr{display:flex;gap:5px;margin-bottom:5px;}
+.pr input{flex:1;font-size:11px;height:26px;padding:0 7px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;color:#111;}
+.pr input:focus{outline:none;border-color:#999;}
+.pr button{width:26px;height:26px;border:1px solid #d0d3d8;border-radius:6px;background:#fff;color:#aaa;cursor:pointer;font-size:13px;}
+.pr button:hover{background:#fee2e2;color:#c00;border-color:#fca5a5;}
+.ab{width:100%;font-size:11px;color:#999;background:none;border:1px dashed #ccc;border-radius:6px;padding:5px;cursor:pointer;margin-top:3px;}
+.ab:hover{background:#e4e6e9;}
+.dv{border:none;border-top:1px solid #dde0e5;margin:12px 0;}
+.toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.toggle-row label.tlabel{font-size:11.5px;color:#666;flex:1;}
+.toggle{position:relative;width:34px;height:18px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.slider-tog{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:18px;transition:0.2s;}
+.slider-tog:before{position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s;}
+.toggle input:checked+.slider-tog{background:#333;}
+.toggle input:checked+.slider-tog:before{transform:translateX(16px);}
+.sidebar-footer{padding:12px 18px;border-top:1px solid #dde0e5;display:flex;gap:8px;background:#eef0f3;}
+.btn-export{flex:1;padding:9px;border-radius:7px;border:none;background:#222;color:#fff;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;}
+.btn-export:hover{background:#444;}
+.btn-reset{padding:9px 14px;border-radius:7px;border:1px solid #ccc;background:#fff;color:#333;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.btn-reset:hover{background:#f0f0f0;}
+.preview-pane{flex:1;display:flex;flex-direction:column;}
+.preview-area{flex:1;min-height:300px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#bbb 25%,transparent 25%),linear-gradient(-45deg,#bbb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#bbb 75%),linear-gradient(-45deg,transparent 75%,#bbb 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;background-color:#d0d0d0;}
+.code-panel{background:#1b1b1b;border-top:1px solid #2a2a2a;display:none;flex-direction:column;}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #2a2a2a;}
+.code-header span{font-size:11px;color:#666;}
+.copy-btn{font-size:11px;background:#2a2a2a;color:#bbb;border:none;border-radius:4px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.copy-btn:hover{background:#3a3a3a;color:#fff;}
+.copy-btn.ok{color:#4ade80;}
+.code-box{padding:12px 14px;font-size:11px;font-family:'DM Mono',monospace;color:#d4d4d4;white-space:pre-wrap;word-break:break-all;line-height:1.6;}
+.pnav{display:inline-flex;align-items:center;gap:2px;}
+.pnav a{text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-title">Navbar customizer</div>
+    <div class="sidebar-inner">
+      <div class="sec">
+        <h3>Container</h3>
+        <div class="row"><label>Background</label><div class="hx"><input type="color" id="a1" value="#f0f0f0"><input type="text" id="a2" value="#f0f0f0" maxlength="7"></div></div>
+        <div class="row"><label>Roundness</label><input type="range" id="b1" min="0" max="40" step="1" value="40"><span class="vl" id="b2">40</span></div>
+        <div class="row"><label>Padding</label><input type="range" id="c1" min="2" max="16" step="1" value="5"><span class="vl" id="c2">5</span></div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Active pill</h3>
+        <div class="row"><label>Background</label><div class="hx"><input type="color" id="d1" value="#ffffff"><input type="text" id="d2" value="#ffffff" maxlength="7"></div></div>
+        <div class="row"><label>Roundness</label><input type="range" id="e1" min="0" max="40" step="1" value="40"><span class="vl" id="e2">40</span></div>
+        <div class="row"><label>Text color</label><div class="hx"><input type="color" id="f1" value="#111111"><input type="text" id="f2" value="#111111" maxlength="7"></div></div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Brand</h3>
+        <div class="row"><label>Name</label><input class="ti" type="text" id="g1" value="Cubed"></div>
+        <div class="row"><label>Link</label><input class="ti" type="text" id="g2" value="/"></div>
+        <div class="row"><label>Image URL</label><input class="ti" type="text" id="g3" placeholder="https://i.imgur.com/..."></div>
+        <div class="row"><label>Logo size</label><input type="range" id="h1" min="16" max="48" step="1" value="24"><span class="vl" id="h2">24</span></div>
+        <div class="row"><label>Font size</label><input type="range" id="i1" min="11" max="24" step="1" value="16"><span class="vl" id="i2">16</span></div>
+        <div class="row"><label>Color</label><div class="hx"><input type="color" id="j1" value="#111111"><input type="text" id="j2" value="#111111" maxlength="7"></div></div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Links</h3>
+        <div class="row"><label>Font size</label><input type="range" id="k1" min="10" max="18" step="1" value="11"><span class="vl" id="k2">11</span></div>
+        <div class="row"><label>Color</label><div class="hx"><input type="color" id="l1" value="#111111"><input type="text" id="l2" value="#111111" maxlength="7"></div></div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Font</h3>
+        <div class="row"><label>Font</label>
+          <select class="sel" id="fontpick">
+            <option value="use-squarespace">Use site styles</option>
+            <option value="'DM Mono', monospace" selected>DM Mono</option>
+            <option value="'DM Sans', sans-serif">DM Sans</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Playfair Display', serif">Playfair Display</option>
+            <option value="'Lora', serif">Lora</option>
+            <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+            <option value="'Syne', sans-serif">Syne</option>
+            <option value="'Outfit', sans-serif">Outfit</option>
+          </select>
+        </div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Behaviour</h3>
+        <div class="toggle-row">
+          <label class="tlabel">Sticky (fixed at top)</label>
+          <label class="toggle"><input type="checkbox" id="sticky" checked><span class="slider-tog"></span></label>
+        </div>
+      </div>
+      <hr class="dv">
+      <div class="sec">
+        <h3>Pages</h3>
+        <div id="plist"></div>
+        <button class="ab" id="addp">+ add page</button>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn-reset" id="rst">Reset</button>
+      <button class="btn-export" id="exp">Export code</button>
+    </div>
+  </div>
+  <div class="preview-pane">
+    <div class="preview-area">
+      <div class="pnav" id="pnav"></div>
+    </div>
+    <div class="code-panel" id="cpanel">
+      <div class="code-header">
+        <span>Squarespace → Settings → Advanced → Code Injection → Header</span>
+        <button class="copy-btn" id="copybtn">Copy all</button>
+      </div>
+      <div class="code-box" id="cbox"></div>
+    </div>
+  </div>
+</div>
+<script>
+var FONTS={"'DM Mono', monospace":"https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap","'DM Sans', sans-serif":"https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap","'Inter', sans-serif":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap","'Playfair Display', serif":"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap","'Lora', serif":"https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap","'Space Grotesk', sans-serif":"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap","'Syne', sans-serif":"https://fonts.googleapis.com/css2?family=Syne:wght@400;500&display=swap","'Outfit', sans-serif":"https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&display=swap"};
+var D={a:'#f0f0f0',b:40,c:5,d:'#ffffff',e:40,f:'#111111',g1:'Cubed',g2:'/',g3:'',h:24,i:16,j:'#111111',k:11,l:'#111111',font:"'DM Mono', monospace",sticky:true,pages:[{l:'Plugins',h:'/'},{l:'About',h:'/about'},{l:'Contact',h:'/contact'},{l:'Cart',h:'/cart'}]};
+var S=JSON.parse(JSON.stringify(D));
+function q(id){return document.getElementById(id);}
+function cp(ci,hi,sk){q(ci).oninput=function(){q(hi).value=this.value;S[sk]=this.value;render();};q(hi).oninput=function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))q(ci).value=this.value;S[sk]=this.value;render();};}
+function rn(ri,vi,sk){q(ri).oninput=function(){q(vi).textContent=this.value;S[sk]=+this.value;render();};}
+cp('a1','a2','a');cp('d1','d2','d');cp('f1','f2','f');cp('j1','j2','j');cp('l1','l2','l');
+rn('b1','b2','b');rn('c1','c2','c');rn('e1','e2','e');rn('h1','h2','h');rn('i1','i2','i');rn('k1','k2','k');
+['g1','g2','g3'].forEach(function(id){q(id).oninput=function(){S[id]=this.value;render();};});
+q('fontpick').onchange=function(){S.font=this.value;render();};
+q('sticky').onchange=function(){S.sticky=this.checked;render();};
+function renderPages(){
+  var el=q('plist');el.innerHTML='';
+  S.pages.forEach(function(p,i){
+    var r=document.createElement('div');r.className='pr';
+    r.innerHTML='<input type="text" placeholder="Label" value="'+p.l+'" data-i="'+i+'" data-f="l"><input type="text" placeholder="/href" value="'+p.h+'" data-i="'+i+'" data-f="h"><button data-d="'+i+'">x</button>';
+    el.appendChild(r);
+  });
+  el.querySelectorAll('input').forEach(function(x){x.oninput=function(){S.pages[this.dataset.i][this.dataset.f]=this.value;render();};});
+  el.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){S.pages.splice(+this.dataset.d,1);renderPages();render();};});
+}
+function getFont(){return S.font==='use-squarespace'?'inherit':S.font;}
+function render(){
+  var nav=q('pnav');
+  nav.style.cssText='display:inline-flex;align-items:center;gap:2px;background:'+S.a+';border-radius:'+S.b+'px;padding:'+S.c+'px '+(S.c+1)+'px;';
+  nav.innerHTML='';
+  var br=document.createElement('a');br.href='#';
+  if(S.g3){var im=document.createElement('img');im.src=S.g3;im.style.cssText='height:'+S.h+'px;width:auto;display:block;';br.appendChild(im);}
+  else br.textContent=S.g1;
+  br.style.cssText='font-family:'+getFont()+';font-size:'+S.i+'px;font-weight:500;color:'+S.j+';text-decoration:none;padding:7px 16px 7px 10px;white-space:nowrap;';
+  nav.appendChild(br);
+  S.pages.forEach(function(p,i){
+    var a=document.createElement('a');a.href='#';a.textContent=p.l;
+    a.style.cssText='font-family:'+getFont()+';font-size:'+S.k+'px;font-weight:400;padding:6px 14px;color:'+(i===0?S.f:S.l)+';text-decoration:none;border-radius:'+S.e+'px;white-space:nowrap;'+(i===0?'background:'+S.d+';':'');
+    nav.appendChild(a);
+  });
+}
+q('addp').onclick=function(){S.pages.push({l:'New Page',h:'/new'});renderPages();render();};
+q('rst').onclick=function(){
+  S=JSON.parse(JSON.stringify(D));
+  q('a1').value=S.a;q('a2').value=S.a;q('d1').value=S.d;q('d2').value=S.d;
+  q('f1').value=S.f;q('f2').value=S.f;q('j1').value=S.j;q('j2').value=S.j;
+  q('l1').value=S.l;q('l2').value=S.l;
+  q('b1').value=S.b;q('b2').textContent=S.b;q('c1').value=S.c;q('c2').textContent=S.c;
+  q('e1').value=S.e;q('e2').textContent=S.e;q('h1').value=S.h;q('h2').textContent=S.h;
+  q('i1').value=S.i;q('i2').textContent=S.i;q('k1').value=S.k;q('k2').textContent=S.k;
+  q('g1').value=S.g1;q('g2').value=S.g2;q('g3').value='';
+  q('fontpick').value=S.font;q('sticky').checked=S.sticky;
+  q('cpanel').style.display='none';
+  renderPages();render();
+};
+function generateCode(){
+  var font=S.font,isSquarespace=font==='use-squarespace',ff=isSquarespace?'inherit':font;
+  var importLine=(!isSquarespace&&FONTS[font])?'@import url(\''+FONTS[font]+'\');\n\n':'';
+  var ps=S.pages.map(function(p){return '    <a class="pnav-link" href="'+p.h+'">'+p.l+'</a>';}).join('\n');
+  var br=S.g3?'<a id="pnav-brand" href="'+S.g2+'"><img src="'+S.g3+'" style="height:'+S.h+'px;width:auto;display:block;" alt="'+S.g1+'"></a>':'<a id="pnav-brand" href="'+S.g2+'">'+S.g1+'</a>';
+  var position=S.sticky?'fixed':'absolute';
+
+  var hideHeader=[
+    '/* Hide Squarespace header entirely */',
+    'header.header,',
+    '.header-nav,',
+    '.header-actions,',
+    '.header-branding,',
+    '.header-title-nav,',
+    '.header-announcement-bar-wrapper,',
+    '.site-navigation,',
+    '#header,',
+    '.Header { display: none !important; }',
+    '',
+    '/* Remove all space reserved for the hidden header */',
+    '.sqs-announcement-bar-dropzone,',
+    '.header-announcement-bar-wrapper { display: none !important; }',
+    '',
+    '/* Pull page content flush to top */',
+    '.Site,',
+    '.Site-inner,',
+    '[data-controller="HeaderOverlapController"] .Site-inner,',
+    '[data-controller="HeaderOverlapController"] .Site-canvas {',
+    '  padding-top: 0 !important;',
+    '  margin-top: 0 !important;',
+    '}',
+    '',
+    '/* Remove Squarespace header height reservation */',
+    '.sqs-layout > .sqs-row:first-child,',
+    '.content-wrapper { margin-top: 0 !important; padding-top: 0 !important; }',
+  ].join('\n');
+
+  var stickyExtra=S.sticky?'\n\n/* Add top padding so content isn\'t hidden behind fixed nav */\n.Site-inner, .Site { padding-top: 72px !important; }':'';
+
+  return '<style>\n'+importLine+hideHeader+stickyExtra+'\n\n'+
+'#pill-nav-wrapper {\n  position: '+position+';\n  top: 16px;\n  left: 0;\n  right: 0;\n  display: flex;\n  justify-content: center;\n  z-index: 9999;\n  pointer-events: none;\n}\n\n'+
+'#pill-nav-inner {\n  display: inline-flex;\n  align-items: center;\n  background: '+S.a+';\n  border-radius: '+S.b+'px;\n  padding: '+S.c+'px '+(S.c+1)+'px;\n  gap: 2px;\n  pointer-events: all;\n}\n\n'+
+'#pnav-brand {\n  font-family: '+ff+';\n  font-size: '+S.i+'px;\n  font-weight: 500;\n  color: '+S.j+';\n  text-decoration: none;\n  padding: 7px 16px 7px 10px;\n  white-space: nowrap;\n}\n\n'+
+'#pnav-brand:hover { color: '+S.j+'; text-decoration: none; }\n\n'+
+'.pnav-link {\n  font-family: '+ff+';\n  font-size: '+S.k+'px;\n  font-weight: 400;\n  padding: 6px 14px;\n  color: '+S.l+';\n  text-decoration: none;\n  border-radius: '+S.e+'px;\n  white-space: nowrap;\n}\n\n'+
+'.pnav-link:hover { opacity: 0.6; text-decoration: none; }\n\n'+
+'.pnav-link.active {\n  background: '+S.d+';\n  color: '+S.f+';\n}\n'+
+'</style>\n\n'+
+'<div id="pill-nav-wrapper">\n  <div id="pill-nav-inner">\n    '+br+'\n'+ps+'\n  </div>\n</div>\n\n'+
+'<script>\ndocument.addEventListener(\'DOMContentLoaded\', function() {\n'+
+'  var path = window.location.pathname;\n'+
+'  var links = document.querySelectorAll(\'.pnav-link\');\n'+
+'  var matched = false;\n'+
+'  links.forEach(function(link) {\n'+
+'    var href = link.getAttribute(\'href\');\n'+
+'    if (path === href || (href !== \'/\' && path.startsWith(href + \'/\'))) {\n'+
+'      link.classList.add(\'active\');\n      matched = true;\n    }\n  });\n'+
+'  if (!matched) links[0].classList.add(\'active\');\n'+
+'  try {\n    var title = window.Static.SQUARESPACE_CONTEXT.website.siteTitle;\n    if (title) document.getElementById(\'pnav-brand\').textContent = title;\n  } catch(e) {}\n});\n'+
+'<\/script>';
+}
+q('exp').onclick=function(){q('cbox').textContent=generateCode();q('cpanel').style.display='flex';};
+q('copybtn').onclick=function(){
+  var code=generateCode();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(function(){q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);}).catch(function(){fallbackCopy(code);});
+  } else {fallbackCopy(code);}
+};
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);}catch(e){alert('Please select all text in the box and copy manually.');}
+  document.body.removeChild(ta);
+}
+renderPages();render();
+</script>
+</body>
+</html>
