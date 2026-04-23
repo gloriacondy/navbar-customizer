@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&family=Inter:wght@400;500&family=Playfair+Display:wght@400;500&family=Lora:wght@400;500&family=Space+Grotesk:wght@400;500&family=Syne:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#fff;font-family:'DM Sans',sans-serif;font-size:12px;color:#222;}
+.app{border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;}
+.preview{height:180px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d8d8d8;border-bottom:1px solid #d0d3d8;}
+.settings{background:#eef0f3;padding:16px 20px;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px;}
+.sec{margin-bottom:14px;}
+.sec h3{font-size:9px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #dde0e5;}
+.row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.row:last-child{margin-bottom:0;}
+.row label{font-size:11px;color:#666;width:68px;flex-shrink:0;}
+.hx{display:flex;align-items:center;gap:4px;flex:1;}
+.hx input[type=color]{width:24px;height:22px;padding:1px;border:1px solid #ccc;border-radius:4px;cursor:pointer;background:#fff;flex-shrink:0;}
+.hx input[type=text]{flex:1;font-size:10px;font-family:'DM Mono',monospace;height:22px;padding:0 5px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;}
+.row input[type=range]{flex:1;accent-color:#333;}
+.vl{font-size:10px;color:#bbb;width:18px;text-align:right;flex-shrink:0;}
+.ti{flex:1;font-size:11px;height:22px;padding:0 6px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;}
+.sel{flex:1;font-size:11px;height:22px;padding:0 5px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;cursor:pointer;}
+input:focus,select:focus{outline:none;border-color:#999;}
+.pages-row{margin-top:12px;padding-top:12px;border-top:1px solid #dde0e5;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;}
+.pages-row h3{font-size:9px;font-weight:500;color:#999;text-transform:uppercase;letter-spacing:0.08em;width:100%;margin-bottom:6px;}
+.page-entries{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.pr{display:flex;gap:4px;align-items:center;}
+.pr input{font-size:10.5px;height:24px;padding:0 6px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;width:90px;}
+.pr input:focus{outline:none;border-color:#999;}
+.pr button{width:20px;height:24px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#aaa;cursor:pointer;font-size:11px;}
+.pr button:hover{background:#fee2e2;color:#c00;border-color:#fca5a5;}
+.add-btn{font-size:10.5px;color:#888;background:#fff;border:1px dashed #ccc;border-radius:4px;padding:0 10px;height:24px;cursor:pointer;white-space:nowrap;}
+.add-btn:hover{background:#e8eaed;}
+.trow{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.trow label.tl{font-size:11px;color:#666;flex:1;}
+.tog{position:relative;width:28px;height:15px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.ts{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:15px;transition:.2s;}
+.ts:before{position:absolute;content:"";height:9px;width:9px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.tog input:checked+.ts{background:#333;}
+.tog input:checked+.ts:before{transform:translateX(13px);}
+.footer{margin-top:14px;padding-top:12px;border-top:1px solid #dde0e5;display:flex;justify-content:flex-end;gap:8px;}
+.btn-reset{padding:7px 14px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#444;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.btn-reset:hover{background:#f0f0f0;}
+.btn-export{padding:7px 18px;border-radius:6px;border:none;background:#222;color:#fff;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;}
+.btn-export:hover{background:#444;}
+.code-panel{display:none;background:#1a1a1a;border-top:1px solid #2a2a2a;}
+.code-panel.open{display:block;}
+.code-top{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #2a2a2a;}
+.code-top span{font-size:10.5px;color:#666;}
+.code-top-btns{display:flex;gap:6px;align-items:center;}
+.copy-btn{font-size:10.5px;background:#2a2a2a;color:#bbb;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;}
+.copy-btn:hover{background:#3a3a3a;color:#fff;}
+.copy-btn.ok{color:#4ade80;}
+.x-btn{width:22px;height:22px;background:#2a2a2a;border:none;border-radius:4px;color:#777;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.x-btn:hover{background:#3a3a3a;color:#fff;}
+.code-box{padding:12px 14px;font-size:10.5px;font-family:'DM Mono',monospace;color:#d4d4d4;white-space:pre-wrap;word-break:break-all;line-height:1.55;max-height:180px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="preview">
+    <div id="pnav"></div>
+  </div>
+  <div class="settings">
+    <div class="grid">
+      <div class="col">
+        <div class="sec">
+          <h3>Container</h3>
+          <div class="row"><label>Background</label><div class="hx"><input type="color" id="a1" value="#f0f0f0"><input type="text" id="a2" value="#f0f0f0" maxlength="7"></div></div>
+          <div class="row"><label>Roundness</label><input type="range" id="b1" min="0" max="40" step="1" value="40"><span class="vl" id="b2">40</span></div>
+          <div class="row"><label>Padding</label><input type="range" id="c1" min="2" max="16" step="1" value="5"><span class="vl" id="c2">5</span></div>
+        </div>
+        <div class="sec">
+          <h3>Active pill</h3>
+          <div class="row"><label>Background</label><div class="hx"><input type="color" id="d1" value="#ffffff"><input type="text" id="d2" value="#ffffff" maxlength="7"></div></div>
+          <div class="row"><label>Roundness</label><input type="range" id="e1" min="0" max="40" step="1" value="40"><span class="vl" id="e2">40</span></div>
+          <div class="row"><label>Text color</label><div class="hx"><input type="color" id="f1" value="#111111"><input type="text" id="f2" value="#111111" maxlength="7"></div></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="sec">
+          <h3>Brand</h3>
+          <div class="row"><label>Name</label><input class="ti" type="text" id="g1" value="Cubed"></div>
+          <div class="row"><label>Link</label><input class="ti" type="text" id="g2" value="/"></div>
+          <div class="row"><label>Image URL</label><input class="ti" type="text" id="g3" placeholder="https://..."></div>
+          <div class="row"><label>Logo size</label><input type="range" id="h1" min="16" max="48" step="1" value="24"><span class="vl" id="h2">24</span></div>
+          <div class="row"><label>Font size</label><input type="range" id="i1" min="11" max="24" step="1" value="16"><span class="vl" id="i2">16</span></div>
+          <div class="row"><label>Color</label><div class="hx"><input type="color" id="j1" value="#111111"><input type="text" id="j2" value="#111111" maxlength="7"></div></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="sec">
+          <h3>Links</h3>
+          <div class="row"><label>Font size</label><input type="range" id="k1" min="10" max="18" step="1" value="11"><span class="vl" id="k2">11</span></div>
+          <div class="row"><label>Color</label><div class="hx"><input type="color" id="l1" value="#111111"><input type="text" id="l2" value="#111111" maxlength="7"></div></div>
+        </div>
+        <div class="sec">
+          <h3>Font</h3>
+          <div class="row"><label>Typeface</label>
+            <select class="sel" id="fontpick">
+              <option value="use-squarespace">Use site styles</option>
+              <option value="'DM Mono', monospace" selected>DM Mono</option>
+              <option value="'DM Sans', sans-serif">DM Sans</option>
+              <option value="'Inter', sans-serif">Inter</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="'Lora', serif">Lora</option>
+              <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+              <option value="'Syne', sans-serif">Syne</option>
+              <option value="'Outfit', sans-serif">Outfit</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="sec">
+          <h3>Behaviour</h3>
+          <div class="trow">
+            <label class="tl">Sticky at top</label>
+            <label class="tog"><input type="checkbox" id="sticky" checked><span class="ts"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pages-row">
+      <h3>Pages</h3>
+      <div class="page-entries" id="plist"></div>
+      <button class="add-btn" id="addp">+ add page</button>
+    </div>
+    <div class="footer">
+      <button class="btn-reset" id="rst">Reset</button>
+      <button class="btn-export" id="exp">Export code</button>
+    </div>
+  </div>
+  <div class="code-panel" id="cpanel">
+    <div class="code-top">
+      <span>Squarespace → Settings → Advanced → Code Injection → Header</span>
+      <div class="code-top-btns">
+        <button class="copy-btn" id="copybtn">Copy all</button>
+        <button class="x-btn" id="xbtn">&#x2715;</button>
+      </div>
+    </div>
+    <div class="code-box" id="cbox"></div>
+  </div>
+</div>
+
+<script>
+var FONTS = {
+  "'DM Mono', monospace": "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap",
+  "'DM Sans', sans-serif": "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap",
+  "'Inter', sans-serif": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap",
+  "'Playfair Display', serif": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap",
+  "'Lora', serif": "https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap",
+  "'Space Grotesk', sans-serif": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap",
+  "'Syne', sans-serif": "https://fonts.googleapis.com/css2?family=Syne:wght@400;500&display=swap",
+  "'Outfit', sans-serif": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&display=swap"
+};
+
+var DEFAULTS = {
+  a:'#f0f0f0', b:40, c:5,
+  d:'#ffffff', e:40, f:'#111111',
+  g1:'Cubed', g2:'/', g3:'',
+  h:24, i:16, j:'#111111',
+  k:11, l:'#111111',
+  font:"'DM Mono', monospace",
+  sticky:true,
+  pages:[{l:'Plugins',h:'/'},{l:'About',h:'/about'},{l:'Contact',h:'/contact'},{l:'Cart',h:'/cart'}]
+};
+
+var S = JSON.parse(JSON.stringify(DEFAULTS));
+
+function q(id){ return document.getElementById(id); }
+
+// Color pair binding
+function bindColor(colorId, hexId, key) {
+  q(colorId).oninput = function() {
+    q(hexId).value = this.value;
+    S[key] = this.value;
+    render();
+  };
+  q(hexId).oninput = function() {
+    var v = this.value;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) q(colorId).value = v;
+    S[key] = v;
+    render();
+  };
+}
+
+// Range binding
+function bindRange(rangeId, valId, key) {
+  q(rangeId).oninput = function() {
+    q(valId).textContent = this.value;
+    S[key] = +this.value;
+    render();
+  };
+}
+
+bindColor('a1','a2','a'); bindColor('d1','d2','d'); bindColor('f1','f2','f');
+bindColor('j1','j2','j'); bindColor('l1','l2','l');
+bindRange('b1','b2','b'); bindRange('c1','c2','c'); bindRange('e1','e2','e');
+bindRange('h1','h2','h'); bindRange('i1','i2','i'); bindRange('k1','k2','k');
+
+['g1','g2','g3'].forEach(function(id) {
+  q(id).oninput = function() { S[id] = this.value; render(); };
+});
+q('fontpick').onchange = function() { S.font = this.value; render(); };
+q('sticky').onchange = function() { S.sticky = this.checked; render(); };
+
+function renderPages() {
+  var el = q('plist');
+  el.innerHTML = '';
+  S.pages.forEach(function(p, i) {
+    var r = document.createElement('div');
+    r.className = 'pr';
+    r.innerHTML =
+      '<input type="text" placeholder="Label" value="' + escAttr(p.l) + '" data-i="' + i + '" data-f="l">' +
+      '<input type="text" placeholder="/href" value="' + escAttr(p.h) + '" data-i="' + i + '" data-f="h">' +
+      '<button data-d="' + i + '">x</button>';
+    el.appendChild(r);
+  });
+  el.querySelectorAll('input').forEach(function(x) {
+    x.oninput = function() {
+      S.pages[+this.dataset.i][this.dataset.f] = this.value;
+      render();
+    };
+  });
+  el.querySelectorAll('[data-d]').forEach(function(b) {
+    b.onclick = function() {
+      S.pages.splice(+this.dataset.d, 1);
+      renderPages();
+      render();
+    };
+  });
+}
+
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+function escHTML(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getFF() {
+  return S.font === 'use-squarespace' ? 'inherit' : S.font;
+}
+
+function render() {
+  var nav = q('pnav');
+  nav.style.cssText =
+    'display:inline-flex;align-items:center;gap:2px;' +
+    'background:' + S.a + ';' +
+    'border-radius:' + S.b + 'px;' +
+    'padding:' + S.c + 'px ' + (S.c + 1) + 'px;';
+  nav.innerHTML = '';
+
+  // Brand
+  var br = document.createElement('a');
+  br.href = '#';
+  if (S.g3) {
+    var im = document.createElement('img');
+    im.src = S.g3;
+    im.style.cssText = 'height:' + S.h + 'px;width:auto;display:block;';
+    br.appendChild(im);
+  } else {
+    br.textContent = S.g1 || 'Brand';
+  }
+  br.style.cssText =
+    'font-family:' + getFF() + ';' +
+    'font-size:' + S.i + 'px;' +
+    'font-weight:500;color:' + S.j + ';' +
+    'text-decoration:none;padding:7px 16px 7px 10px;white-space:nowrap;';
+  nav.appendChild(br);
+
+  // Links — first page gets active pill in preview
+  S.pages.forEach(function(p, i) {
+    var a = document.createElement('a');
+    a.href = '#';
+    a.textContent = p.l || 'Page';
+    var isActive = (i === 0);
+    a.style.cssText =
+      'font-family:' + getFF() + ';' +
+      'font-size:' + S.k + 'px;' +
+      'font-weight:400;' +
+      'padding:6px 14px;' +
+      'color:' + (isActive ? S.f : S.l) + ';' +
+      'text-decoration:none;' +
+      'border-radius:' + S.e + 'px;' +
+      'white-space:nowrap;' +
+      (isActive ? 'background:' + S.d + ';' : '');
+    nav.appendChild(a);
+  });
+}
+
+q('addp').onclick = function() {
+  S.pages.push({l:'New Page', h:'/new-page'});
+  renderPages();
+  render();
+};
+
+q('xbtn').onclick = function() {
+  q('cpanel').classList.remove('open');
+};
+
+q('rst').onclick = function() {
+  S = JSON.parse(JSON.stringify(DEFAULTS));
+  q('a1').value=S.a; q('a2').value=S.a;
+  q('d1').value=S.d; q('d2').value=S.d;
+  q('f1').value=S.f; q('f2').value=S.f;
+  q('j1').value=S.j; q('j2').value=S.j;
+  q('l1').value=S.l; q('l2').value=S.l;
+  q('b1').value=S.b; q('b2').textContent=S.b;
+  q('c1').value=S.c; q('c2').textContent=S.c;
+  q('e1').value=S.e; q('e2').textContent=S.e;
+  q('h1').value=S.h; q('h2').textContent=S.h;
+  q('i1').value=S.i; q('i2').textContent=S.i;
+  q('k1').value=S.k; q('k2').textContent=S.k;
+  q('g1').value=S.g1; q('g2').value=S.g2; q('g3').value='';
+  q('fontpick').value=S.font;
+  q('sticky').checked=S.sticky;
+  q('cpanel').classList.remove('open');
+  renderPages();
+  render();
+};
+
+function generateCode() {
+  var ff = getFF();
+  var isCustomFont = (S.font !== 'use-squarespace');
+  var fontURL = isCustomFont ? FONTS[S.font] : null;
+
+  // Build link tags HTML
+  var pageLinks = S.pages.map(function(p) {
+    return '    <a class="pnav-link" href="' + escHTML(p.h) + '">' + escHTML(p.l) + '</a>';
+  }).join('\n');
+
+  // Brand HTML
+  var brandInner = S.g3
+    ? '<img src="' + escHTML(S.g3) + '" style="height:' + S.h + 'px;width:auto;display:block;" alt="' + escHTML(S.g1) + '">'
+    : escHTML(S.g1 || 'Brand');
+  var brandHTML = '<a id="pnav-brand" href="' + escHTML(S.g2 || '/') + '">' + brandInner + '</a>';
+
+  var pos = S.sticky ? 'fixed' : 'absolute';
+
+  // Only push page content down when sticky, and use a CSS var so it matches nav height
+  var pushDown = S.sticky
+    ? '\n/* Push page content below fixed nav */\n.Site-inner { padding-top: 64px !important; }'
+    : '';
+
+  var fontImport = fontURL ? '@import url("' + fontURL + '");\n\n' : '';
+
+  var css =
+    '<style>\n' +
+    fontImport +
+    '/* Hide Squarespace native header */\n' +
+    '.Header, header.Header, #header,\n' +
+    '.header-nav, .header-actions, .header-branding,\n' +
+    '.header-announcement-bar-wrapper,\n' +
+    '[data-section-theme] .Header,\n' +
+    '.site-header { display: none !important; }\n\n' +
+    '/* Remove any top spacing the theme adds expecting a header */\n' +
+    '.Site-inner,\n' +
+    '.Site-canvas,\n' +
+    '.sqs-layout > .sqs-row:first-child,\n' +
+    '.content-wrapper { margin-top: 0 !important; padding-top: 0 !important; }\n' +
+    pushDown + '\n\n' +
+    '/* Pill nav wrapper — centered, floats above page */\n' +
+    '#pnav-wrap {\n' +
+    '  position: ' + pos + ';\n' +
+    '  top: 16px;\n' +
+    '  left: 0;\n' +
+    '  right: 0;\n' +
+    '  display: flex;\n' +
+    '  justify-content: center;\n' +
+    '  z-index: 9999;\n' +
+    '  pointer-events: none;\n' +
+    '}\n\n' +
+    '#pnav-inner {\n' +
+    '  display: inline-flex;\n' +
+    '  align-items: center;\n' +
+    '  gap: 2px;\n' +
+    '  background: ' + S.a + ';\n' +
+    '  border-radius: ' + S.b + 'px;\n' +
+    '  padding: ' + S.c + 'px ' + (S.c + 1) + 'px;\n' +
+    '  pointer-events: all;\n' +
+    '}\n\n' +
+    '#pnav-brand {\n' +
+    '  font-family: ' + ff + ';\n' +
+    '  font-size: ' + S.i + 'px;\n' +
+    '  font-weight: 500;\n' +
+    '  color: ' + S.j + ';\n' +
+    '  text-decoration: none;\n' +
+    '  padding: 7px 16px 7px 10px;\n' +
+    '  white-space: nowrap;\n' +
+    '  display: block;\n' +
+    '}\n' +
+    '#pnav-brand:hover { opacity: 0.75; }\n\n' +
+    '.pnav-link {\n' +
+    '  font-family: ' + ff + ';\n' +
+    '  font-size: ' + S.k + 'px;\n' +
+    '  font-weight: 400;\n' +
+    '  padding: 6px 14px;\n' +
+    '  color: ' + S.l + ';\n' +
+    '  text-decoration: none;\n' +
+    '  border-radius: ' + S.e + 'px;\n' +
+    '  white-space: nowrap;\n' +
+    '  transition: opacity 0.15s;\n' +
+    '}\n' +
+    '.pnav-link:hover { opacity: 0.6; }\n\n' +
+    '.pnav-link.active {\n' +
+    '  background: ' + S.d + ';\n' +
+    '  color: ' + S.f + ';\n' +
+    '}\n' +
+    '</style>';
+
+  var html =
+    '\n<div id="pnav-wrap">\n' +
+    '  <div id="pnav-inner">\n' +
+    '    ' + brandHTML + '\n' +
+    pageLinks + '\n' +
+    '  </div>\n' +
+    '</div>';
+
+  // Active page highlighting script
+  // Robust: exact match first, then prefix match (excluding "/"), fallback to first link
+  var js =
+    '\n<script>\n' +
+    '(function() {\n' +
+    '  function setActive() {\n' +
+    '    var path = window.location.pathname.replace(/\\/$/, "") || "/";\n' +
+    '    var links = document.querySelectorAll(".pnav-link");\n' +
+    '    var best = null;\n' +
+    '    var bestLen = -1;\n' +
+    '    links.forEach(function(link) {\n' +
+    '      var href = link.getAttribute("href").replace(/\\/$/, "") || "/";\n' +
+    '      if (path === href) {\n' +
+    '        best = link;\n' +
+    '        bestLen = href.length + 1000;\n' +
+    '      } else if (href !== "/" && path.indexOf(href) === 0 && href.length > bestLen) {\n' +
+    '        best = link;\n' +
+    '        bestLen = href.length;\n' +
+    '      }\n' +
+    '    });\n' +
+    '    if (!best && links.length) best = links[0];\n' +
+    '    if (best) best.classList.add("active");\n' +
+    '  }\n' +
+    '  if (document.readyState === "loading") {\n' +
+    '    document.addEventListener("DOMContentLoaded", setActive);\n' +
+    '  } else {\n' +
+    '    setActive();\n' +
+    '  }\n' +
+    '})();\n' +
+    '<\/script>';
+
+  return css + html + js;
+}
+
+q('exp').onclick = function() {
+  var code = generateCode();
+  q('cbox').textContent = code;
+  q('cpanel').classList.add('open');
+};
+
+q('copybtn').onclick = function() {
+  var code = generateCode();
+  var btn = q('copybtn');
+  function markCopied() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('ok');
+    setTimeout(function() { btn.textContent = 'Copy all'; btn.classList.remove('ok'); }, 2000);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(markCopied).catch(function() { fallbackCopy(code); });
+  } else {
+    fallbackCopy(code);
+  }
+};
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    q('copybtn').textContent = 'Copied!';
+    q('copybtn').classList.add('ok');
+    setTimeout(function() { q('copybtn').textContent = 'Copy all'; q('copybtn').classList.remove('ok'); }, 2000);
+  } catch(e) {
+    alert('Copy the code manually from the box.');
+  }
+  document.body.removeChild(ta);
+}
+
+renderPages();
+render();
+</script>
+</body>
+</html>
