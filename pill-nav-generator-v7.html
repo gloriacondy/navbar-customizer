@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500&family=DM+Sans:wght@400;500&family=Inter:wght@400;500&family=Playfair+Display:wght@400;500&family=Lora:wght@400;500&family=Space+Grotesk:wght@400;500&family=Syne:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#fff;font-family:'Manrope',sans-serif;font-size:12px;color:#222;}
+.app{border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;}
+.preview{height:180px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d8d8d8;border-bottom:1px solid #d0d3d8;}
+.settings{background:#eef0f3;padding:16px 20px;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px;}
+.sec{margin-bottom:14px;position:relative;}
+.sec h3{font-size:9px;font-weight:500;color:#999;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #dde0e5;display:flex;align-items:center;justify-content:space-between;}
+.tip-btn{width:14px;height:14px;border-radius:50%;border:1px solid #ccc;background:#fff;color:#aaa;font-size:9px;font-family:'Manrope',sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;padding:0;font-weight:500;text-transform:none;letter-spacing:0;}
+.tip-btn:hover{background:#e8eaed;color:#666;border-color:#aaa;}
+.tooltip{display:none;position:absolute;top:22px;right:0;width:200px;background:#222;color:#eee;font-size:10px;font-family:'Manrope',sans-serif;line-height:1.5;padding:8px 10px;border-radius:6px;z-index:100;pointer-events:none;text-transform:none;letter-spacing:0;font-weight:400;}
+.tooltip.left{right:auto;left:0;}
+.tip-btn:hover + .tooltip,.tip-btn:focus + .tooltip{display:block;}
+.row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.row:last-child{margin-bottom:0;}
+.row label{font-size:11px;color:#666;font-family:'Manrope',sans-serif;width:68px;flex-shrink:0;}
+.hx{display:flex;align-items:center;gap:4px;flex:1;}
+.hx input[type=color]{width:24px;height:22px;padding:1px;border:1px solid #ccc;border-radius:4px;cursor:pointer;background:#fff;flex-shrink:0;}
+.hx input[type=text]{flex:1;font-size:10px;font-family:'DM Mono',monospace;height:22px;padding:0 5px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;}
+.row input[type=range]{flex:1;accent-color:#333;}
+.vl{font-size:10px;color:#bbb;font-family:'DM Mono',monospace;width:22px;text-align:right;flex-shrink:0;}
+.ti{flex:1;font-size:11px;font-family:'Manrope',sans-serif;height:22px;padding:0 6px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;}
+.sel{flex:1;font-size:11px;font-family:'Manrope',sans-serif;height:22px;padding:0 5px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;cursor:pointer;}
+input:focus,select:focus{outline:none;border-color:#999;}
+.pages-row{margin-top:12px;padding-top:12px;border-top:1px solid #dde0e5;}
+.pages-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pages-header h3{font-size:9px;font-weight:500;color:#999;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin:0;}
+.pages-header-right{display:flex;align-items:center;gap:6px;position:relative;}
+.page-entries{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;}
+.pr{display:flex;gap:5px;align-items:center;}
+.pr-sep{width:1px;height:22px;background:#d0d3d8;flex-shrink:0;}
+.pr input.lbl-input{font-size:10.5px;font-family:'Manrope',sans-serif;height:24px;padding:0 6px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;width:100px;flex-shrink:0;}
+.pr input.href-input{font-size:10px;font-family:'DM Mono',monospace;height:24px;padding:0 6px 0 24px;border:1px solid #ccc;border-radius:4px;background:#f7f8fa;color:#444;flex:1;min-width:0;}
+.href-wrap{position:relative;flex:1;min-width:0;display:flex;align-items:center;}
+.href-icon{position:absolute;left:7px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0.4;}
+.href-icon svg{width:11px;height:11px;display:block;}
+.pr-del{width:22px;height:24px;border:1px solid #d0d3d8;border-radius:4px;background:#ebebeb;color:#999;cursor:pointer;font-size:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pr-del:hover{background:#fee2e2;color:#c00;border-color:#fca5a5;}
+.add-btn{font-size:10.5px;font-family:'Manrope',sans-serif;color:#888;background:#fff;border:1px dashed #ccc;border-radius:4px;padding:0 10px;height:24px;cursor:pointer;white-space:nowrap;}
+.add-btn:hover{background:#e8eaed;}
+.trow{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.trow:last-child{margin-bottom:0;}
+.trow label.tl{font-size:11px;color:#666;font-family:'Manrope',sans-serif;flex:1;}
+.tog{position:relative;width:28px;height:15px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.ts{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:15px;transition:.2s;}
+.ts:before{position:absolute;content:"";height:9px;width:9px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.tog input:checked+.ts{background:#333;}
+.tog input:checked+.ts:before{transform:translateX(13px);}
+.footer{margin-top:14px;padding-top:12px;border-top:1px solid #dde0e5;display:flex;justify-content:flex-end;gap:8px;}
+.btn-reset{padding:7px 14px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#444;font-size:11px;font-family:'Manrope',sans-serif;cursor:pointer;}
+.btn-reset:hover{background:#f0f0f0;}
+.btn-export{padding:7px 18px;border-radius:6px;border:none;background:#222;color:#fff;font-size:11px;font-family:'Manrope',sans-serif;cursor:pointer;font-weight:500;}
+.btn-export:hover{background:#444;}
+.code-panel{display:none;background:#1a1a1a;border-top:1px solid #2a2a2a;}
+.code-panel.open{display:block;}
+.code-top{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #2a2a2a;}
+.code-top span{font-size:10.5px;color:#666;font-family:'Manrope',sans-serif;}
+.code-top-btns{display:flex;gap:6px;align-items:center;}
+.copy-btn{font-size:10.5px;font-family:'Manrope',sans-serif;background:#2a2a2a;color:#bbb;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;}
+.copy-btn:hover{background:#3a3a3a;color:#fff;}
+.copy-btn.ok{color:#4ade80;}
+.x-btn{width:22px;height:22px;background:#2a2a2a;border:none;border-radius:4px;color:#777;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.x-btn:hover{background:#3a3a3a;color:#fff;}
+.code-box{padding:12px 14px;font-size:10.5px;font-family:'DM Mono',monospace;color:#d4d4d4;white-space:pre-wrap;word-break:break-all;line-height:1.55;max-height:180px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="preview">
+    <div id="pnav"></div>
+  </div>
+  <div class="settings">
+    <div class="grid">
+
+      <div class="col">
+        <div class="sec">
+          <h3>Container <button class="tip-btn" tabindex="0">?</button><span class="tooltip">The background bar the whole nav sits inside. You can change its colour, how rounded the edges are, and how much space there is around the links.</span></h3>
+          <div class="row"><label>Background</label><div class="hx"><input type="color" id="a1" value="#f0f0f0"><input type="text" id="a2" value="#f0f0f0" maxlength="7"></div></div>
+          <div class="row"><label>Roundness</label><input type="range" id="b1" min="0" max="40" step="1" value="40"><span class="vl" id="b2">40</span></div>
+          <div class="row"><label>Padding</label><input type="range" id="c1" min="2" max="16" step="1" value="5"><span class="vl" id="c2">5</span></div>
+          <div class="row"><label>Stroke</label><input type="range" id="cstroke1" min="0" max="6" step="0.5" value="0"><span class="vl" id="cstroke2">0</span></div>
+          <div class="row"><label>Stroke color</label><div class="hx"><input type="color" id="csc1" value="#cccccc"><input type="text" id="csc2" value="#cccccc" maxlength="7"></div></div>
+        </div>
+        <div class="sec">
+          <h3>Active pill <button class="tip-btn" tabindex="0">?</button><span class="tooltip">The little highlight that appears on whichever page the visitor is currently on. You can change its colour, shape, text colour, and add a border around it.</span></h3>
+          <div class="row"><label>Background</label><div class="hx"><input type="color" id="d1" value="#ffffff"><input type="text" id="d2" value="#ffffff" maxlength="7"></div></div>
+          <div class="row"><label>Roundness</label><input type="range" id="e1" min="0" max="40" step="1" value="40"><span class="vl" id="e2">40</span></div>
+          <div class="row"><label>Text color</label><div class="hx"><input type="color" id="f1" value="#111111"><input type="text" id="f2" value="#111111" maxlength="7"></div></div>
+          <div class="row"><label>Stroke</label><input type="range" id="pstroke1" min="0" max="6" step="0.5" value="0"><span class="vl" id="pstroke2">0</span></div>
+          <div class="row"><label>Stroke color</label><div class="hx"><input type="color" id="psc1" value="#cccccc"><input type="text" id="psc2" value="#cccccc" maxlength="7"></div></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="sec">
+          <h3>Brand <button class="tip-btn" tabindex="0">?</button><span class="tooltip left">This is the name or logo on the left side of the nav. Type a name and it shows as text. Paste an image link into "Image URL" and it shows as a logo instead. We recommend postimages.org for free image hosting. Clicking it takes visitors to whatever link you set.</span></h3>
+          <div class="row"><label>Name</label><input class="ti" type="text" id="g1" value="Cubed"></div>
+          <div class="row"><label>Link</label><input class="ti" type="text" id="g2" value="/"></div>
+          <div class="row"><label>Image URL</label><input class="ti" type="text" id="g3" placeholder="https://..."></div>
+          <div class="row"><label>Logo size</label><input type="range" id="h1" min="16" max="48" step="1" value="24"><span class="vl" id="h2">24</span></div>
+          <div class="row"><label>Font size</label><input type="range" id="i1" min="11" max="24" step="1" value="16"><span class="vl" id="i2">16</span></div>
+          <div class="row"><label>Color</label><div class="hx"><input type="color" id="j1" value="#111111"><input type="text" id="j2" value="#111111" maxlength="7"></div></div>
+          <div class="row"><label>Gap to links</label><input type="range" id="gap1" min="8" max="48" step="2" value="18"><span class="vl" id="gap2">18</span></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="sec">
+          <h3>Links <button class="tip-btn" tabindex="0">?</button><span class="tooltip">The page links in your nav. Set how big the text is and what colour it appears when a page is not active.</span></h3>
+          <div class="row"><label>Font size</label><input type="range" id="k1" min="10" max="18" step="1" value="11"><span class="vl" id="k2">11</span></div>
+          <div class="row"><label>Color</label><div class="hx"><input type="color" id="l1" value="#111111"><input type="text" id="l2" value="#111111" maxlength="7"></div></div>
+        </div>
+        <div class="sec">
+          <h3>Font <button class="tip-btn" tabindex="0">?</button><span class="tooltip">The font used across the whole nav. Pick one from the list, or choose "Use site styles" to match whatever font your Squarespace site is already using.</span></h3>
+          <div class="row"><label>Typeface</label>
+            <select class="sel" id="fontpick">
+              <option value="use-squarespace">Use site styles</option>
+              <option value="'DM Mono', monospace" selected>DM Mono</option>
+              <option value="'DM Sans', sans-serif">DM Sans</option>
+              <option value="'Inter', sans-serif">Inter</option>
+              <option value="'Playfair Display', serif">Playfair Display</option>
+              <option value="'Lora', serif">Lora</option>
+              <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+              <option value="'Syne', sans-serif">Syne</option>
+              <option value="'Outfit', sans-serif">Outfit</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="sec">
+          <h3>Behaviour <button class="tip-btn" tabindex="0">?</button><span class="tooltip left">Sticky keeps the nav visible at the top of the screen as visitors scroll down. Hide on scroll makes it disappear when scrolling down, and reappear when scrolling back up. Remove top gap eliminates the empty space Squarespace leaves behind where its header used to be.</span></h3>
+          <div class="trow">
+            <label class="tl">Sticky at top</label>
+            <label class="tog"><input type="checkbox" id="sticky" checked><span class="ts"></span></label>
+          </div>
+          <div class="trow">
+            <label class="tl">Hide on scroll down</label>
+            <label class="tog"><input type="checkbox" id="hideOnScroll"><span class="ts"></span></label>
+          </div>
+          <div class="trow">
+            <label class="tl">Remove top gap <button class="tip-btn" tabindex="0" style="margin-left:2px;">?</button><span class="tooltip left" style="top:18px;width:210px;">Removes the empty space Squarespace leaves at the top of the page. Turn this off if you're using a full image or video background and want the nav to float over it instead.</span></label>
+            <label class="tog"><input type="checkbox" id="removeGap" checked><span class="ts"></span></label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pages-row">
+      <div class="pages-header">
+        <h3>Pages</h3>
+        <div class="pages-header-right">
+          <button class="tip-btn" id="pagesTipBtn" tabindex="0">?</button>
+          <span class="tooltip" id="pagesTooltip" style="right:0;top:22px;width:230px;">Each row is one link in your nav. The left box is what visitors see as the label. The right box is the page address — it needs to match exactly what you've set in Squarespace (e.g. /about, /contact). You can find this under Pages in your Squarespace panel.</span>
+          <button class="add-btn" id="addp">+ add page</button>
+        </div>
+      </div>
+      <div class="page-entries" id="plist"></div>
+    </div>
+
+    <div class="footer">
+      <button class="btn-reset" id="rst">Reset</button>
+      <button class="btn-export" id="exp">Export code</button>
+    </div>
+  </div>
+
+  <div class="code-panel" id="cpanel">
+    <div class="code-top">
+      <span>Squarespace → Settings → Advanced → Code Injection → Header</span>
+      <div class="code-top-btns">
+        <button class="copy-btn" id="copybtn">Copy all</button>
+        <button class="x-btn" id="xbtn">&#x2715;</button>
+      </div>
+    </div>
+    <div class="code-box" id="cbox"></div>
+  </div>
+</div>
+
+<script>
+var FONTS={
+  "'DM Mono', monospace":"https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap",
+  "'DM Sans', sans-serif":"https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap",
+  "'Inter', sans-serif":"https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap",
+  "'Playfair Display', serif":"https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap",
+  "'Lora', serif":"https://fonts.googleapis.com/css2?family=Lora:wght@400;500&display=swap",
+  "'Space Grotesk', sans-serif":"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&display=swap",
+  "'Syne', sans-serif":"https://fonts.googleapis.com/css2?family=Syne:wght@400;500&display=swap",
+  "'Outfit', sans-serif":"https://fonts.googleapis.com/css2?family=Outfit:wght@400;500&display=swap"
+};
+
+var DEFAULTS={
+  a:'#f0f0f0',b:40,c:5,
+  cstroke:0,csc:'#cccccc',
+  d:'#ffffff',e:40,f:'#111111',
+  pstroke:0,psc:'#cccccc',
+  g1:'Cubed',g2:'/',g3:'',
+  h:24,i:16,j:'#111111',
+  gap:18,k:11,l:'#111111',
+  font:"'DM Mono', monospace",
+  sticky:true,hideOnScroll:false,removeGap:true,
+  pages:[{l:'Plugins',h:'/plugins'},{l:'About',h:'/about'},{l:'Contact',h:'/contact'},{l:'Cart',h:'/cart'}]
+};
+
+var S=JSON.parse(JSON.stringify(DEFAULTS));
+function q(id){return document.getElementById(id);}
+
+function bindColor(ci,hi,key){
+  q(ci).oninput=function(){q(hi).value=this.value;S[key]=this.value;render();};
+  q(hi).oninput=function(){if(/^#[0-9a-fA-F]{6}$/.test(this.value))q(ci).value=this.value;S[key]=this.value;render();};
+}
+function bindRange(ri,vi,key){
+  q(ri).oninput=function(){q(vi).textContent=this.value;S[key]=+this.value;render();};
+}
+
+bindColor('a1','a2','a');bindColor('d1','d2','d');bindColor('f1','f2','f');
+bindColor('j1','j2','j');bindColor('l1','l2','l');
+bindColor('csc1','csc2','csc');bindColor('psc1','psc2','psc');
+bindRange('b1','b2','b');bindRange('c1','c2','c');bindRange('e1','e2','e');
+bindRange('h1','h2','h');bindRange('i1','i2','i');bindRange('k1','k2','k');
+bindRange('cstroke1','cstroke2','cstroke');bindRange('pstroke1','pstroke2','pstroke');
+bindRange('gap1','gap2','gap');
+
+['g1','g2','g3'].forEach(function(id){q(id).oninput=function(){S[id]=this.value;render();};});
+q('fontpick').onchange=function(){S.font=this.value;render();};
+q('sticky').onchange=function(){S.sticky=this.checked;render();};
+q('hideOnScroll').onchange=function(){S.hideOnScroll=this.checked;render();};
+q('removeGap').onchange=function(){S.removeGap=this.checked;render();};
+
+var linkSVG='<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M7.5 1H11m0 0v3.5M11 1L5.5 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function renderPages(){
+  var el=q('plist');el.innerHTML='';
+  S.pages.forEach(function(p,i){
+    var r=document.createElement('div');r.className='pr';
+    r.innerHTML=
+      '<input type="text" class="lbl-input" placeholder="Page name" value="'+escAttr(p.l)+'" data-i="'+i+'" data-f="l">'+
+      '<div class="pr-sep"></div>'+
+      '<div class="href-wrap"><span class="href-icon">'+linkSVG+'</span><input type="text" class="href-input" placeholder="/page-slug" value="'+escAttr(p.h)+'" data-i="'+i+'" data-f="h"></div>'+
+      '<button class="pr-del" data-d="'+i+'">&#x2715;</button>';
+    el.appendChild(r);
+  });
+  el.querySelectorAll('input').forEach(function(x){
+    x.oninput=function(){S.pages[+this.dataset.i][this.dataset.f]=this.value;render();};
+  });
+  el.querySelectorAll('[data-d]').forEach(function(b){
+    b.onclick=function(){S.pages.splice(+this.dataset.d,1);renderPages();render();};
+  });
+}
+
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function escHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getFF(){return S.font==='use-squarespace'?'inherit':S.font;}
+
+function render(){
+  var nav=q('pnav');
+  var pv=S.c,ph_right=S.c+6,ph_left=S.c+12;
+  var borderCSS=S.cstroke>0?S.cstroke+'px solid '+S.csc:'none';
+  nav.style.cssText=
+    'display:inline-flex;align-items:center;background:'+S.a+';'+
+    'border-radius:'+S.b+'px;'+
+    'padding:'+pv+'px '+ph_right+'px '+pv+'px '+ph_left+'px;'+
+    'border:'+borderCSS+';';
+  nav.innerHTML='';
+
+  var br=document.createElement('a');br.href='#';
+  if(S.g3){var im=document.createElement('img');im.src=S.g3;im.style.cssText='height:'+S.h+'px;width:auto;display:block;';br.appendChild(im);}
+  else{br.textContent=S.g1||'Brand';}
+  br.style.cssText='font-family:'+getFF()+';font-size:'+S.i+'px;font-weight:500;color:'+S.j+';text-decoration:none;padding:7px 0;margin-right:'+S.gap+'px;white-space:nowrap;';
+  nav.appendChild(br);
+
+  var lastIdx=S.pages.length-1;
+  S.pages.forEach(function(p,i){
+    var a=document.createElement('a');a.href='#';a.textContent=p.l||'Page';
+    var isDemo=(i===lastIdx);
+    var pillBorder=isDemo&&S.pstroke>0?S.pstroke+'px solid '+S.psc:'none';
+    a.style.cssText=
+      'font-family:'+getFF()+';font-size:'+S.k+'px;font-weight:400;'+
+      'padding:6px 14px;color:'+(isDemo?S.f:S.l)+';text-decoration:none;'+
+      'border-radius:'+S.e+'px;white-space:nowrap;border:'+pillBorder+';'+
+      (isDemo?'background:'+S.d+';':'');
+    nav.appendChild(a);
+  });
+}
+
+q('addp').onclick=function(){S.pages.push({l:'New Page',h:'/new-page'});renderPages();render();};
+q('xbtn').onclick=function(){q('cpanel').classList.remove('open');};
+
+q('rst').onclick=function(){
+  S=JSON.parse(JSON.stringify(DEFAULTS));
+  q('a1').value=S.a;q('a2').value=S.a;q('d1').value=S.d;q('d2').value=S.d;
+  q('f1').value=S.f;q('f2').value=S.f;q('j1').value=S.j;q('j2').value=S.j;
+  q('l1').value=S.l;q('l2').value=S.l;q('csc1').value=S.csc;q('csc2').value=S.csc;
+  q('psc1').value=S.psc;q('psc2').value=S.psc;
+  q('b1').value=S.b;q('b2').textContent=S.b;q('c1').value=S.c;q('c2').textContent=S.c;
+  q('e1').value=S.e;q('e2').textContent=S.e;q('h1').value=S.h;q('h2').textContent=S.h;
+  q('i1').value=S.i;q('i2').textContent=S.i;q('k1').value=S.k;q('k2').textContent=S.k;
+  q('cstroke1').value=S.cstroke;q('cstroke2').textContent=S.cstroke;
+  q('pstroke1').value=S.pstroke;q('pstroke2').textContent=S.pstroke;
+  q('gap1').value=S.gap;q('gap2').textContent=S.gap;
+  q('g1').value=S.g1;q('g2').value=S.g2;q('g3').value='';
+  q('fontpick').value=S.font;q('sticky').checked=S.sticky;
+  q('hideOnScroll').checked=S.hideOnScroll;q('removeGap').checked=S.removeGap;
+  q('cpanel').classList.remove('open');
+  renderPages();render();
+};
+
+function generateCode(){
+  var ff=getFF();
+  var fontURL=(S.font!=='use-squarespace')?FONTS[S.font]:null;
+  var pv=S.c,ph_right=S.c+6,ph_left=S.c+12;
+  var containerBorder=S.cstroke>0?S.cstroke+'px solid '+S.csc:'none';
+  var pillBorder=S.pstroke>0?S.pstroke+'px solid '+S.psc:'none';
+  var fontImport=fontURL?'@import url("'+fontURL+'");\n\n':'';
+
+  // Gap removal CSS — only output when toggle is on
+  var gapCSS=S.removeGap
+    ?'.Site-inner, .Site-canvas,\n'+
+     '.sqs-layout > .sqs-row:first-child,\n'+
+     '.content-wrapper { margin-top: 0 !important; padding-top: 0 !important; }\n'
+    :'';
+
+  var pushDown=S.sticky&&S.removeGap?'\n.Site-inner { padding-top: 64px !important; }':'';
+
+  var pos=S.sticky?'fixed':'absolute';
+  var hideCSS=S.hideOnScroll&&S.sticky
+    ?'\n#pnav-wrap {\n  transition: transform 0.3s ease;\n}\n#pnav-wrap.pnav-hidden {\n  transform: translateY(calc(-100% - 24px));\n}'
+    :'';
+
+  var css=
+    '<style>\n'+fontImport+
+    '.Header, header.Header, #header,\n'+
+    '.header-nav, .header-actions, .header-branding,\n'+
+    '.header-announcement-bar-wrapper,\n'+
+    '[data-section-theme] .Header,\n'+
+    '.site-header { display: none !important; }\n\n'+
+    gapCSS+
+    pushDown+'\n\n'+
+    '#pnav-wrap {\n'+
+    '  position: '+pos+';\n'+
+    '  top: 16px; left: 0; right: 0;\n'+
+    '  display: flex; justify-content: center;\n'+
+    '  z-index: 9999; pointer-events: none;\n'+
+    '}'+hideCSS+'\n\n'+
+    '#pnav-inner {\n'+
+    '  display: inline-flex; align-items: center;\n'+
+    '  background: '+S.a+';\n'+
+    '  border-radius: '+S.b+'px;\n'+
+    '  padding: '+pv+'px '+ph_right+'px '+pv+'px '+ph_left+'px;\n'+
+    '  border: '+containerBorder+';\n'+
+    '  pointer-events: all;\n'+
+    '}\n\n'+
+    '#pnav-brand {\n'+
+    '  font-family: '+ff+'; font-size: '+S.i+'px; font-weight: 500;\n'+
+    '  color: '+S.j+'; text-decoration: none;\n'+
+    '  padding: 7px 0; margin-right: '+S.gap+'px;\n'+
+    '  white-space: nowrap; display: block;\n'+
+    '}\n'+
+    '#pnav-brand:hover { opacity: 0.75; }\n\n'+
+    '.pnav-link {\n'+
+    '  font-family: '+ff+'; font-size: '+S.k+'px; font-weight: 400;\n'+
+    '  padding: 6px 14px; color: '+S.l+';\n'+
+    '  text-decoration: none; border-radius: '+S.e+'px;\n'+
+    '  white-space: nowrap; transition: opacity 0.15s;\n'+
+    '  border: none;\n'+
+    '}\n'+
+    '.pnav-link:hover { opacity: 0.6; }\n\n'+
+    '.pnav-link.active {\n'+
+    '  background: '+S.d+'; color: '+S.f+';\n'+
+    '  border: '+pillBorder+';\n'+
+    '}\n'+
+    '</style>';
+
+  var pageLinks=S.pages.map(function(pg){
+    return '    <a class="pnav-link" href="'+escHTML(pg.h)+'">'+escHTML(pg.l)+'</a>';
+  }).join('\n');
+
+  var brandInner=S.g3
+    ?'<img src="'+escHTML(S.g3)+'" style="height:'+S.h+'px;width:auto;display:block;" alt="'+escHTML(S.g1)+'">'
+    :escHTML(S.g1||'Brand');
+  var brandHTML='<a id="pnav-brand" href="'+escHTML(S.g2||'/')+'">'+brandInner+'</a>';
+
+  var html=
+    '\n<div id="pnav-wrap">\n'+
+    '  <div id="pnav-inner">\n'+
+    '    '+brandHTML+'\n'+
+    pageLinks+'\n'+
+    '  </div>\n'+
+    '</div>';
+
+  var hideScript=S.hideOnScroll&&S.sticky
+    ?'\n\n  var wrap = document.getElementById("pnav-wrap");\n'+
+     '  var lastY = 0;\n'+
+     '  window.addEventListener("scroll", function() {\n'+
+     '    var y = window.scrollY;\n'+
+     '    if (y > lastY && y > 60) {\n'+
+     '      wrap.classList.add("pnav-hidden");\n'+
+     '    } else {\n'+
+     '      wrap.classList.remove("pnav-hidden");\n'+
+     '    }\n'+
+     '    lastY = y;\n'+
+     '  }, { passive: true });'
+    :'';
+
+  var js=
+    '\n<script>\n'+
+    '(function() {\n'+
+    '  function setActive() {\n'+
+    '    var path = window.location.pathname.replace(/\\/$/, "") || "/";\n'+
+    '    var links = document.querySelectorAll(".pnav-link");\n'+
+    '    var best = null, bestLen = -1;\n'+
+    '    links.forEach(function(link) {\n'+
+    '      var href = link.getAttribute("href").replace(/\\/$/, "") || "/";\n'+
+    '      if (href === "/") return;\n'+
+    '      if (path === href || path.indexOf(href + "/") === 0) {\n'+
+    '        if (href.length > bestLen) { best = link; bestLen = href.length; }\n'+
+    '      }\n'+
+    '    });\n'+
+    '    if (best) best.classList.add("active");\n'+
+    '  }\n'+
+    '  if (document.readyState === "loading") {\n'+
+    '    document.addEventListener("DOMContentLoaded", setActive);\n'+
+    '  } else { setActive(); }'+
+    hideScript+'\n'+
+    '})();\n'+
+    '<\/script>';
+
+  return css+html+js;
+}
+
+q('exp').onclick=function(){q('cbox').textContent=generateCode();q('cpanel').classList.add('open');};
+
+q('copybtn').onclick=function(){
+  var code=generateCode(),btn=q('copybtn');
+  function markCopied(){btn.textContent='Copied!';btn.classList.add('ok');setTimeout(function(){btn.textContent='Copy all';btn.classList.remove('ok');},2000);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(markCopied).catch(function(){fallbackCopy(code);});}
+  else{fallbackCopy(code);}
+};
+
+function fallbackCopy(text){
+  var ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');q('copybtn').textContent='Copied!';q('copybtn').classList.add('ok');setTimeout(function(){q('copybtn').textContent='Copy all';q('copybtn').classList.remove('ok');},2000);}
+  catch(e){alert('Copy the code manually from the box.');}
+  document.body.removeChild(ta);
+}
+
+var pagesTipBtn=q('pagesTipBtn');
+var pagesTooltip=q('pagesTooltip');
+pagesTooltip.style.display='none';
+pagesTipBtn.addEventListener('mouseenter',function(){pagesTooltip.style.display='block';});
+pagesTipBtn.addEventListener('mouseleave',function(){pagesTooltip.style.display='none';});
+
+renderPages();render();
+</script>
+</body>
+</html>
