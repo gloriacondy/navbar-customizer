@@ -3,205 +3,254 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:#fff;font-family:'Manrope',sans-serif;font-size:12px;color:#222;}
 
+/* ── Shell ── */
 .app{border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;}
 
-.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);align-items:start;}
-@media(max-width:640px){.cols{grid-template-columns:1fr;}}
+/* ── Two-column layout: left scrolls, right is fixed ── */
+.cols{display:flex;align-items:stretch;}
+@media(max-width:640px){.cols{flex-direction:column;}}
 
-/* ─── LEFT: Settings ─── */
-.settings{background:#eef0f3;padding:16px 20px;border-right:1px solid #d0d3d8;}
+/* ── Left pane (settings) ── */
+.settings{flex:1;min-width:0;background:#eef0f3;padding:16px 20px 16px;border-right:1px solid #d0d3d8;display:flex;flex-direction:column;gap:12px;}
 
-.sec{margin-bottom:14px;position:relative;}
-.sec h3{font-size:9px;font-weight:500;color:#999;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #dde0e5;}
+/* ── Section card — white interior ── */
+.sec{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:hidden;}
+.sec-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;}
+.sec-body{padding:12px;background:#fff;}
+.field{margin-bottom:10px;}
+.field:last-child{margin-bottom:0;}
+.lbl{font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;color:#444;margin-bottom:5px;display:block;}
 
-/* URL row */
-.url-row{display:flex;align-items:center;gap:6px;}
-.url-inp{flex:1;font-size:11px;font-family:'Manrope',sans-serif;height:26px;padding:0 7px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;outline:none;}
-.url-inp:focus{border-color:#999;}
-.url-inp::placeholder{color:#bbb;}
-.prev-btn{font-size:9px;font-family:'DM Mono',monospace;letter-spacing:.06em;text-transform:uppercase;height:26px;padding:0 10px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#666;cursor:pointer;white-space:nowrap;flex-shrink:0;}
-.prev-btn:hover{background:#e8eaed;color:#333;border-color:#aaa;}
+/* ── URL input + Preview button row ── */
+.url-row{display:flex;gap:6px;align-items:stretch;}
+.url-row input[type="url"]{flex:1;font-family:'Manrope',sans-serif;font-size:12px;color:#111;background:#fff;border:1px solid #ccc;border-radius:5px;padding:5px 8px;outline:none;}
+.url-row input[type="url"]:focus{border-color:#888;}
+.url-row input[type="url"]::placeholder{color:#bbb;}
+.preview-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:#222;color:#fff;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.preview-btn:hover{background:#444;}
+.preview-btn.ok{background:#1D9E75;}
 
-/* Seg */
-.seg{display:flex;border:1px solid #ccc;border-radius:4px;overflow:hidden;margin-bottom:8px;}
-.seg-btn{flex:1;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 4px;border:none;background:#fff;color:#888;cursor:pointer;border-right:1px solid #ccc;}
+/* ── Segment control ── */
+.seg{display:flex;border:1px solid #ccc;border-radius:5px;overflow:hidden;}
+.seg-btn{flex:1;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:6px 4px;border:none;background:#fff;color:#888;cursor:pointer;border-right:1px solid #ccc;}
 .seg-btn:last-child{border-right:none;}
 .seg-btn.on{background:#222;color:#fff;}
-.seg-btn:hover:not(.on){background:#e8eaed;color:#444;}
+.seg-btn:hover:not(.on){background:#f0f0f0;color:#444;}
 
-/* Row */
-.row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
-.row:last-child{margin-bottom:0;}
-.row label{font-size:11px;color:#666;font-family:'Manrope',sans-serif;width:72px;flex-shrink:0;}
-.row input[type=range]{flex:1;accent-color:#333;}
-.vl{font-size:10px;color:#bbb;font-family:'DM Mono',monospace;width:28px;text-align:right;flex-shrink:0;}
-
-/* Colors */
-.color-pair{display:flex;gap:10px;margin-top:6px;}
-.color-item{flex:1;}
-.clbl{font-size:10px;color:#888;font-family:'Manrope',sans-serif;margin-bottom:4px;display:block;}
-.hx{display:flex;align-items:center;gap:4px;}
-.hx input[type=color]{width:24px;height:22px;padding:1px;border:1px solid #ccc;border-radius:4px;cursor:pointer;background:#fff;flex-shrink:0;}
-.hx input[type=text]{flex:1;font-size:10px;font-family:'DM Mono',monospace;height:22px;padding:0 5px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#111;outline:none;}
-.hx input[type=text]:focus{border-color:#999;}
-
-/* Pills */
-.pill-group{display:flex;gap:4px;flex-wrap:wrap;}
-.pill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;}
+/* ── Pill group (Type selectors) ── */
+.pill-group{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;}
 .pill.on{background:#222;color:#fff;border-color:#222;}
-.pill:hover:not(.on){background:#e8eaed;color:#444;}
+.pill:hover:not(.on){background:#f0f0f0;color:#444;}
 
-/* Playback toggles */
-.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;}
-.pb-toggle{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;white-space:nowrap;width:100%;}
-.pb-toggle.on{background:#222;color:#fff;border-color:#222;}
-.pb-toggle:hover:not(.on){background:#e8eaed;color:#444;}
-.pb-span2{grid-column:span 2;}
+/* ── Toggle pills (playback on/off) ── */
+.toggle-pill-group{display:flex;gap:6px;flex-wrap:wrap;}
+.tpill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;min-width:100px;text-align:center;}
+.tpill.on{background:#222;color:#fff;border-color:#222;}
+.tpill:hover:not(.on){background:#f0f0f0;color:#444;}
 
-/* Footer */
-.footer{margin-top:14px;padding-top:12px;border-top:1px solid #dde0e5;display:flex;justify-content:flex-end;gap:8px;}
-.btn-reset{padding:7px 14px;border-radius:6px;border:1px solid #ccc;background:#fff;color:#444;font-size:11px;font-family:'Manrope',sans-serif;cursor:pointer;}
-.btn-reset:hover{background:#f0f0f0;}
-.btn-export{padding:7px 18px;border-radius:6px;border:none;background:#222;color:#fff;font-size:11px;font-family:'Manrope',sans-serif;cursor:pointer;font-weight:500;}
-.btn-export:hover{background:#444;}
+/* ── Slider ── */
+.slider-row{display:flex;gap:8px;align-items:center;}
+.slider-row input[type="range"]{flex:1;accent-color:#222;height:3px;}
+.sval{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;min-width:34px;text-align:right;}
 
-/* ─── RIGHT: Preview + Code ─── */
-.right-panel{display:flex;flex-direction:column;}
+/* ── Color pair ── */
+.color-pair{display:flex;gap:12px;}
+.color-item{flex:1;}
+.color-swatch-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #ccc;cursor:pointer;padding:1px;background:#fff;}
+.chex{font-family:'DM Mono',monospace;font-size:10px;color:#888;}
 
-.preview-area{display:flex;align-items:center;justify-content:center;height:260px;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d8d8d8;border-bottom:1px solid #d0d3d8;}
+/* ── Right pane: fixed 300px, flex column ── */
+.right-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;}
+@media(max-width:640px){.right-pane{width:100%;}}
 
-/* Code panel — height = preview-area height = 260px */
-.code-panel{background:#1a1a1a;}
-.code-top{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #2a2a2a;}
-.code-top-label{font-size:10.5px;color:#666;font-family:'Manrope',sans-serif;}
-.copy-btn{font-size:10.5px;font-family:'Manrope',sans-serif;background:#2a2a2a;color:#bbb;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;}
-.copy-btn:hover{background:#3a3a3a;color:#fff;}
-.copy-btn.ok{color:#4ade80;}
-.code-box{padding:12px 14px;font-size:10.5px;font-family:'DM Mono',monospace;color:#d4d4d4;white-space:pre-wrap;word-break:break-all;line-height:1.55;height:224px;overflow-y:auto;}
+/* ── Preview area (fixed height, never grows) ── */
+.preview-area{flex-shrink:0;}
+.preview-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;}
+.checker{display:flex;align-items:center;justify-content:center;padding:20px;min-height:280px;background-color:#d8d8d8;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;}
+
+/* ── Code area: fills remaining space, code box scrolls internally ── */
+.code-area{flex:1;display:flex;flex-direction:column;border-top:1px solid #d0d3d8;min-height:0;}
+.code-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;flex-shrink:0;}
+.code-body{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-height:0;}
+/* code-pre: fixed max height so it never pushes the right column taller than settings */
+.code-pre{font-family:'DM Mono',monospace;font-size:10.5px;color:#d4d4d4;background:#1a1a1a;border-radius:6px;padding:10px 12px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.6;max-height:260px;}
+.copy-btn{width:100%;padding:8px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;background:#222;color:#fff;border:none;border-radius:6px;cursor:pointer;flex-shrink:0;}
+.copy-btn:hover{background:#444;}
+.copy-btn.ok{background:#1D9E75;}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="cols">
 
-    <!-- LEFT -->
+    <!-- ══ LEFT: Settings ══ -->
     <div class="settings">
 
+      <!-- Video Source -->
       <div class="sec">
-        <h3>Video Source</h3>
-        <div class="seg" id="src-seg">
-          <button class="seg-btn on" onclick="setSrc('url',0)">Direct URL</button>
-          <button class="seg-btn" onclick="setSrc('youtube',1)">YouTube</button>
-          <button class="seg-btn" onclick="setSrc('vimeo',2)">Vimeo</button>
-        </div>
-        <div id="url-lbl" style="font-size:10px;color:#999;font-family:'DM Mono',monospace;margin-bottom:4px;">Direct video URL (.mp4, .webm)</div>
-        <div class="url-row">
-          <input class="url-inp" type="text" id="video-url" placeholder="https://your-video.mp4" oninput="update()">
-          <button class="prev-btn" onclick="previewUrl()">Preview</button>
-        </div>
-      </div>
-
-      <div class="sec">
-        <h3>Frame</h3>
-        <div class="row" style="margin-bottom:8px;">
-          <label>Type</label>
-          <div class="pill-group" id="frame-group">
-            <button class="pill on" onclick="pick('frame-group',this);st.frame='none';update()">None</button>
-            <button class="pill" onclick="pick('frame-group',this);st.frame='iphone';update()">iPhone</button>
-            <button class="pill" onclick="pick('frame-group',this);st.frame='minimal';update()">Minimal</button>
-            <button class="pill" onclick="pick('frame-group',this);st.frame='shadow';update()">Shadow</button>
-          </div>
-        </div>
-        <div class="row">
-          <label>Radius</label>
-          <input type="range" min="0" max="40" value="12" step="1" oninput="st.radius=+this.value;document.getElementById('rv').textContent=this.value+'px';update()">
-          <span class="vl" id="rv">12px</span>
-        </div>
-        <div class="row">
-          <label>Max width</label>
-          <input type="range" min="160" max="500" value="320" step="10" oninput="st.maxw=+this.value;document.getElementById('wv').textContent=this.value+'px';update()">
-          <span class="vl" id="wv">320px</span>
-        </div>
-      </div>
-
-      <div class="sec">
-        <h3>Border &amp; Color</h3>
-        <div class="row">
-          <label>Border</label>
-          <input type="range" min="0" max="12" value="0" step="1" oninput="st.borderW=+this.value;document.getElementById('bv').textContent=this.value===0?'None':this.value+'px';update()">
-          <span class="vl" id="bv">None</span>
-        </div>
-        <div class="color-pair">
-          <div class="color-item">
-            <span class="clbl">Border color</span>
-            <div class="hx">
-              <input type="color" id="border-color" value="#ffffff" oninput="st.borderColor=this.value;document.getElementById('bc-hex').value=this.value;update()">
-              <input type="text" id="bc-hex" value="#ffffff" maxlength="7" oninput="st.borderColor=this.value;document.getElementById('border-color').value=this.value;update()">
+        <div class="sec-hd">Video Source</div>
+        <div class="sec-body">
+          <div class="field">
+            <div class="seg" id="src-seg">
+              <button class="seg-btn on" onclick="setSrc('url',0)">Direct URL</button>
+              <button class="seg-btn" onclick="setSrc('youtube',1)">YouTube</button>
+              <button class="seg-btn" onclick="setSrc('vimeo',2)">Vimeo</button>
             </div>
           </div>
-          <div class="color-item">
-            <span class="clbl">Background</span>
-            <div class="hx">
-              <input type="color" id="bg-color" value="#000000" oninput="st.bgColor=this.value;document.getElementById('bg-hex').value=this.value;update()">
-              <input type="text" id="bg-hex" value="#000000" maxlength="7" oninput="st.bgColor=this.value;document.getElementById('bg-color').value=this.value;update()">
+          <div class="field">
+            <label class="lbl" id="url-lbl">Direct video URL (.mp4, .webm)</label>
+            <div class="url-row">
+              <input type="url" id="video-url" placeholder="https://your-video.mp4" oninput="update()">
+              <button class="preview-btn" id="prev-btn" onclick="forcePreview()">Preview</button>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Frame -->
       <div class="sec">
-        <h3>Playback</h3>
-        <div class="pb-grid">
-          <button class="pb-toggle on" id="ap-pill" onclick="st.autoplay=!st.autoplay;this.classList.toggle('on',st.autoplay);update()">Autoplay</button>
-          <button class="pb-toggle on" id="lp-pill" onclick="st.loop=!st.loop;this.classList.toggle('on',st.loop);update()">Loop</button>
-          <button class="pb-toggle on" id="mu-pill" onclick="st.muted=!st.muted;this.classList.toggle('on',st.muted);update()">Muted</button>
-          <button class="pb-toggle on" id="hb-pill" onclick="st.hideSource=!st.hideSource;this.classList.toggle('on',st.hideSource);update()">Hide branding</button>
-          <button class="pb-toggle on pb-span2" id="hc-pill" onclick="st.hoverControls=!st.hoverControls;this.classList.toggle('on',st.hoverControls);update()">Controls for viewers</button>
-        </div>
-      </div>
-
-      <div class="footer">
-        <button class="btn-reset" onclick="resetAll()">Reset</button>
-        <button class="btn-export" onclick="copyCode()">Copy Code</button>
-      </div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div class="right-panel">
-      <div class="preview-area" id="preview-area">
-        <div style="position:relative;" id="phone-shell">
-          <div id="vc" style="position:relative;overflow:hidden;">
-            <div style="position:absolute;inset:0;z-index:10;pointer-events:none;"></div>
-            <div id="vi" style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.35)"><path d="M8 5v14l11-7z"/></svg>
+        <div class="sec-hd">Frame</div>
+        <div class="sec-body">
+          <div class="field">
+            <label class="lbl">Type</label>
+            <div class="pill-group" id="frame-group">
+              <button class="pill on" onclick="pick('frame-group',this);st.frame='none';update()">None</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='iphone';update()">iPhone</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='minimal';update()">Minimal</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='shadow';update()">Shadow</button>
+            </div>
+          </div>
+          <!-- iPhone case color — only shown when iPhone frame is selected -->
+          <div class="field" id="case-color-field" style="display:none;">
+            <label class="lbl">iPhone Case Color</label>
+            <div class="color-swatch-row">
+              <input type="color" id="case-color" value="#1a1a1a" oninput="st.caseColor=this.value;document.getElementById('case-hex').textContent=this.value;update()">
+              <span class="chex" id="case-hex">#1a1a1a</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Corner radius</label>
+            <div class="slider-row">
+              <input type="range" min="0" max="40" value="12" step="1" oninput="st.radius=+this.value;document.getElementById('rv').textContent=this.value+'px';update()">
+              <span class="sval" id="rv">12px</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Max width</label>
+            <div class="slider-row">
+              <input type="range" min="160" max="500" value="320" step="10" oninput="st.maxw=+this.value;document.getElementById('wv').textContent=this.value+'px';update()">
+              <span class="sval" id="wv">320px</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="code-panel">
-        <div class="code-top">
-          <span class="code-top-label">Embed Code — paste into Squarespace Code Block</span>
-          <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy all</button>
+      <!-- Border & Color -->
+      <div class="sec">
+        <div class="sec-hd">Border &amp; Color</div>
+        <div class="sec-body">
+          <div class="field">
+            <label class="lbl">Border width</label>
+            <div class="slider-row">
+              <input type="range" min="0" max="12" value="0" step="1" oninput="st.borderW=+this.value;document.getElementById('bv').textContent=this.value===0?'None':this.value+'px';update()">
+              <span class="sval" id="bv">None</span>
+            </div>
+          </div>
+          <div class="color-pair">
+            <div class="color-item">
+              <label class="lbl">Border color</label>
+              <div class="color-swatch-row">
+                <input type="color" id="border-color" value="#ffffff" oninput="st.borderColor=this.value;document.getElementById('bc-hex').textContent=this.value;update()">
+                <span class="chex" id="bc-hex">#ffffff</span>
+              </div>
+            </div>
+            <div class="color-item">
+              <label class="lbl">Background</label>
+              <div class="color-swatch-row">
+                <input type="color" id="bg-color" value="#000000" oninput="st.bgColor=this.value;document.getElementById('bg-hex').textContent=this.value;update()">
+                <span class="chex" id="bg-hex">#000000</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="code-box" id="code-out"></div>
       </div>
-    </div>
+
+      <!-- Playback -->
+      <div class="sec">
+        <div class="sec-hd">Playback</div>
+        <div class="sec-body">
+          <div class="field">
+            <label class="lbl">Options — click to toggle on/off</label>
+            <div class="toggle-pill-group">
+              <button class="tpill on" id="tp-autoplay" onclick="togglePill('tp-autoplay');st.autoplay=!st.autoplay;update()">Autoplay</button>
+              <button class="tpill on" id="tp-loop"     onclick="togglePill('tp-loop');st.loop=!st.loop;update()">Loop</button>
+              <button class="tpill on" id="tp-muted"    onclick="togglePill('tp-muted');st.muted=!st.muted;update()">Muted</button>
+              <button class="tpill on" id="tp-hide"     onclick="togglePill('tp-hide');st.hideSource=!st.hideSource;update()">Hide Branding</button>
+              <button class="tpill on" id="tp-ctrl"     onclick="togglePill('tp-ctrl');st.hoverControls=!st.hoverControls;update()">Controls for Viewers</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /settings -->
+
+    <!-- ══ RIGHT: Preview + Code ══ -->
+    <div class="right-pane">
+
+      <!-- Preview (fixed, never expands) -->
+      <div class="preview-area">
+        <div class="preview-hd">Preview</div>
+        <div class="checker" id="checker">
+          <div style="position:relative;display:inline-block;" id="phone-shell">
+            <div id="vc" style="position:relative;overflow:hidden;">
+              <!-- click-shield so preview clicks don't trigger video controls -->
+              <div style="position:absolute;inset:0;z-index:10;"></div>
+              <div id="vi" style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.4)"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code output -->
+      <div class="code-area">
+        <div class="code-hd">Embed Code — Paste into Squarespace Code Block</div>
+        <div class="code-body">
+          <pre class="code-pre" id="code-out"></pre>
+          <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+      </div>
+
+    </div><!-- /right-pane -->
 
   </div>
 </div>
 
 <script>
-const st={url:'',srcType:'url',frame:'none',radius:12,maxw:320,borderW:0,borderColor:'#ffffff',bgColor:'#000000',autoplay:true,loop:true,muted:true,hideSource:true,hoverControls:true};
+const st={
+  url:'',srcType:'url',frame:'none',caseColor:'#1a1a1a',
+  radius:12,maxw:320,borderW:0,borderColor:'#ffffff',bgColor:'#000000',
+  autoplay:true,loop:true,muted:true,hideSource:true,hoverControls:true
+};
 
-function pick(gid,el){document.getElementById(gid).querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+/* ── Toggle pill (single pill acts as on/off) ── */
+function togglePill(id){document.getElementById(id).classList.toggle('on');}
 
+/* ── Type pill group (radio-style) ── */
+function pick(gid,el){
+  document.getElementById(gid).querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ── Source type switch ── */
 function setSrc(t,idx){
   st.srcType=t;
   document.querySelectorAll('#src-seg .seg-btn').forEach((b,i)=>b.classList.toggle('on',i===idx));
@@ -212,94 +261,50 @@ function setSrc(t,idx){
   update();
 }
 
-function previewUrl(){
-  const url=document.getElementById('video-url').value.trim();
-  if(!url){alert('Please enter a video URL first.');return;}
-  st.url=url;
-  renderPreview();
+/* ── Force-preview button: rebuilds vi content ── */
+function forcePreview(){
+  st.url=document.getElementById('video-url').value.trim();
+  renderPreview(true);
   renderCode();
+  const btn=document.getElementById('prev-btn');
+  btn.textContent='✓';btn.classList.add('ok');
+  setTimeout(()=>{btn.textContent='Preview';btn.classList.remove('ok');},1800);
 }
 
+/* ── Main update ── */
 function update(){
   st.url=document.getElementById('video-url').value.trim();
-  renderPreview();
+  document.getElementById('case-color-field').style.display=(st.frame==='iphone')?'':'none';
+  renderPreview(false);
   renderCode();
 }
 
-function renderPreview(){
-  const vc=document.getElementById('vc'),vi=document.getElementById('vi');
-  const areaH=260;
-  const h=areaH-24;
-  const w=Math.round(h*9/16);
-  vc.style.width=w+'px';vc.style.height=h+'px';
-  const r=st.frame==='iphone'?28:st.radius;
-  vc.style.borderRadius=r+'px';
-  vi.style.background=st.bgColor;
-  vc.style.border='none';vc.style.boxShadow='none';
-  const shell=document.getElementById('phone-shell');
-  shell.querySelectorAll('.pn,.ph').forEach(e=>e.remove());
-  vi.querySelectorAll('video,iframe').forEach(e=>e.remove());
-
-  if(st.frame==='iphone'){
-    vc.style.border='3px solid #1a1a1a';
-    vc.style.boxShadow='0 0 0 6px #2a2a2a,0 0 0 9px #3a3a3a';
-    const n=document.createElement('div');n.className='pn';
-    n.style.cssText='position:absolute;top:0;left:50%;transform:translateX(-50%);width:58px;height:14px;background:#1a1a1a;border-radius:0 0 8px 8px;z-index:15;';
-    const hb=document.createElement('div');hb.className='ph';
-    hb.style.cssText='position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:52px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;z-index:15;';
-    vc.appendChild(n);vc.appendChild(hb);
-  }else if(st.frame==='shadow'){
-    vc.style.boxShadow='0 12px 40px rgba(0,0,0,0.4)';
-  }else if(st.frame==='minimal'){
-    vc.style.border='1px solid rgba(255,255,255,0.2)';
-  }
-  if(st.borderW>0)vc.style.border=`${st.borderW}px solid ${st.borderColor}`;
-
-  const icon=vi.querySelector('svg');
-  if(st.url){
-    const embed=getEmbed();
-    if(embed){
-      if(embed.type==='iframe'){
-        const ifr=document.createElement('iframe');
-        ifr.src=embed.src;
-        ifr.setAttribute('frameborder','0');
-        ifr.setAttribute('allow','autoplay; fullscreen; picture-in-picture');
-        ifr.setAttribute('allowfullscreen','');
-        ifr.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;border:none;z-index:5;';
-        vi.appendChild(ifr);
-      }else{
-        const vid=document.createElement('video');
-        vid.src=embed.src;
-        if(st.autoplay)vid.autoplay=true;
-        if(st.loop)vid.loop=true;
-        if(st.muted)vid.muted=true;
-        vid.setAttribute('playsinline','');
-        vid.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:5;';
-        vi.appendChild(vid);
-      }
-      if(icon)icon.style.display='none';
-    }
-  }else{
-    if(icon)icon.style.display='';
-  }
+/* ── YouTube ID extractor (handles Shorts, youtu.be, watch?v=) ── */
+function getYouTubeId(url){
+  const shorts=url.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/);
+  if(shorts)return shorts[1];
+  const std=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_-]{11})/);
+  if(std)return std[1];
+  const raw=url.trim().match(/^[A-Za-z0-9_-]{11}$/);
+  return raw?raw[0]:url.trim();
 }
 
+/* ── Embed config ── */
 function getEmbed(){
-  const url=st.url;if(!url)return null;
+  const url=st.url; if(!url)return null;
   if(st.srcType==='youtube'){
-    const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
-    const id=m?m[1]:url.trim();
+    const id=getYouTubeId(url);
     const p=['playsinline=1','rel=0','modestbranding=1','enablejsapi=1'];
     if(st.autoplay)p.push('autoplay=1');
     if(st.loop)p.push('loop=1','playlist='+id);
     if(st.muted)p.push('mute=1');
     if(st.hideSource)p.push('controls=0','iv_load_policy=3','disablekb=1');
-    return{type:'iframe',src:`https://www.youtube.com/embed/${id}?`+p.join('&')};
+    return{type:'iframe',src:`https://www.youtube.com/embed/${id}?`+p.join('&'),ytId:id};
   }
   if(st.srcType==='vimeo'){
     const m=url.match(/vimeo\.com\/(\d+)/);
     const id=m?m[1]:url.replace(/\D/g,'');
-    const p=['playsinline=1'];
+    const p=['playsinline=1','dnt=1'];
     if(st.hideSource)p.push('background=1');
     if(st.autoplay)p.push('autoplay=1');
     if(st.loop)p.push('loop=1');
@@ -309,53 +314,153 @@ function getEmbed(){
   return{type:'video',src:url};
 }
 
+/* ── Preview renderer ── */
+function renderPreview(force){
+  const vc=document.getElementById('vc');
+  const vi=document.getElementById('vi');
+  const shell=document.getElementById('phone-shell');
+
+  // Clean up old iphone decorations
+  shell.querySelectorAll('.pn,.ph').forEach(e=>e.remove());
+
+  // Size calculation
+  const previewW=Math.min(st.maxw,160);
+  const previewH=Math.round(previewW*(16/9));
+
+  vc.style.width=previewW+'px';
+  vc.style.height=previewH+'px';
+  vc.style.border='none';
+  vc.style.boxShadow='none';
+
+  const r=st.frame==='iphone'?28:st.radius;
+  vc.style.borderRadius=r+'px';
+  vi.style.background=st.bgColor;
+
+  // iPhone frame: box-shadow approach (colored case surrounds the video)
+  if(st.frame==='iphone'){
+    const cc=st.caseColor||'#1a1a1a';
+    const mid=adjustHex(cc,12);
+    const dark=adjustHex(cc,-8);
+    vc.style.boxShadow=`0 0 0 7px ${cc},0 0 0 9px ${mid}`;
+    vc.style.border=`3px solid ${dark}`;
+    // Notch
+    const n=document.createElement('div');
+    n.className='pn';
+    n.style.cssText=`position:absolute;top:0;left:50%;transform:translateX(-50%);width:58px;height:14px;background:${dark};border-radius:0 0 8px 8px;z-index:15;pointer-events:none;`;
+    // Home bar
+    const hb=document.createElement('div');
+    hb.className='ph';
+    hb.style.cssText=`position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:52px;height:4px;background:${mid};border-radius:2px;z-index:15;pointer-events:none;`;
+    vc.appendChild(n);
+    vc.appendChild(hb);
+  } else if(st.frame==='shadow'){
+    vc.style.boxShadow='0 12px 40px rgba(0,0,0,0.4)';
+  } else if(st.frame==='minimal'){
+    vc.style.border='1px solid rgba(255,255,255,0.2)';
+  }
+  if(st.borderW>0) vc.style.border=`${st.borderW}px solid ${st.borderColor}`;
+
+  // Video content: only (re)build on force OR if vi is currently empty / has placeholder
+  const hasSrc=vi.querySelector('video,iframe');
+  if(!force && hasSrc && st.url) return;
+
+  vi.innerHTML='';
+  if(!st.url){
+    vi.innerHTML='<svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.4)"><path d="M8 5v14l11-7z"/></svg>';
+    return;
+  }
+
+  const embed=getEmbed();
+  if(!embed)return;
+
+  if(embed.type==='iframe'){
+    // For YouTube/Vimeo: show a thumbnail placeholder instead of attempting cross-origin iframe
+    // (iframes from YouTube/Vimeo block embedding in file:// or cross-origin contexts)
+    if(embed.ytId){
+      // YouTube thumbnail
+      const thumb=document.createElement('img');
+      thumb.src=`https://img.youtube.com/vi/${embed.ytId}/hqdefault.jpg`;
+      thumb.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';
+      thumb.onerror=()=>{thumb.style.display='none';};
+      vi.appendChild(thumb);
+      const badge=document.createElement('div');
+      badge.style.cssText='position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.6);color:#fff;font-family:DM Mono,monospace;font-size:9px;padding:3px 8px;border-radius:4px;letter-spacing:.06em;white-space:nowrap;';
+      badge.textContent='YouTube — live on your site';
+      vi.appendChild(badge);
+    } else {
+      // Vimeo — just show a label
+      vi.innerHTML=`<div style="color:rgba(255,255,255,0.6);font-family:'DM Mono',monospace;font-size:9px;text-align:center;padding:10px;letter-spacing:.06em;">Vimeo<br>live on your site</div>`;
+    }
+  } else {
+    // Direct video — embed directly
+    const vid=document.createElement('video');
+    vid.src=embed.src;
+    if(st.autoplay){vid.autoplay=true;}
+    if(st.loop){vid.loop=true;}
+    if(st.muted){vid.muted=true;vid.setAttribute('muted','');}
+    vid.setAttribute('playsinline','');
+    vid.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';
+    vi.appendChild(vid);
+  }
+}
+
+/* ── Simple hex lightener/darkener ── */
+function adjustHex(hex,amt){
+  const h=hex.replace('#','');
+  const r=Math.max(0,Math.min(255,parseInt(h.slice(0,2),16)+amt));
+  const g=Math.max(0,Math.min(255,parseInt(h.slice(2,4),16)+amt));
+  const b=Math.max(0,Math.min(255,parseInt(h.slice(4,6),16)+amt));
+  return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── Code generator ── */
 function renderCode(){
   const embed=getEmbed();
   const r=st.frame==='iphone'?28:st.radius;
-  let extra='';
-  if(st.frame==='iphone')extra+=`\n    box-shadow:0 0 0 6px #2a2a2a,0 0 0 9px #3a3a3a;\n    border:3px solid #1a1a1a;`;
-  if(st.frame==='shadow')extra+=`\n    box-shadow:0 12px 40px rgba(0,0,0,0.5);`;
-  if(st.frame==='minimal')extra+=`\n    border:1px solid rgba(255,255,255,0.2);`;
-  if(st.borderW>0)extra+=`\n    border:${st.borderW}px solid ${st.borderColor};`;
+  const cc=st.caseColor||'#1a1a1a';
+  const mid=adjustHex(cc,12);
+  const dark=adjustHex(cc,-8);
 
-  const iphoneHTML=st.frame==='iphone'?`
-  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:58px;height:14px;background:#1a1a1a;border-radius:0 0 8px 8px;z-index:2;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:52px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;z-index:2;pointer-events:none;"></div>`:'';
+  let containerStyle=`position:relative;width:100%;max-width:${st.maxw}px;aspect-ratio:9/16;background:${st.bgColor};border-radius:${r}px;overflow:hidden;`;
+  if(st.frame==='iphone') containerStyle+=`box-shadow:0 0 0 7px ${cc},0 0 0 9px ${mid};border:3px solid ${dark};`;
+  if(st.frame==='shadow') containerStyle+=`box-shadow:0 12px 40px rgba(0,0,0,0.5);`;
+  if(st.frame==='minimal') containerStyle+=`border:1px solid rgba(255,255,255,0.2);`;
+  if(st.borderW>0) containerStyle+=`border:${st.borderW}px solid ${st.borderColor};`;
+
+  const iphoneDecor=st.frame==='iphone'?`
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:58px;height:14px;background:${dark};border-radius:0 0 8px 8px;z-index:15;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:52px;height:4px;background:${mid};border-radius:2px;z-index:15;pointer-events:none;"></div>`:'';
+
+  // Controls HTML — hardcoded positions
+  const controlsHTML=st.hoverControls?`
+  <div id="vv-ctrl" style="position:absolute;inset:0;opacity:0;transition:opacity 0.2s;z-index:6;pointer-events:none;">
+    <button id="vv-mute" style="position:absolute;top:10px;left:10px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    </button>
+    <button id="vv-play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="${st.autoplay?'M6 19h4V5H6v14zm8-14v14h4V5h-4z':'M8 5v14l11-7z'}"/></svg>
+    </button>
+    <div id="vv-bar" style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.25);cursor:pointer;pointer-events:auto;">
+      <div id="vv-prog" style="height:100%;width:0%;background:#fff;transition:width 0.1s linear;"></div>
+    </div>
+  </div>`:'';
 
   let mediaEl='  <!-- Add a video URL above to generate embed code -->';
   if(embed){
     if(embed.type==='iframe'){
       mediaEl=`  <iframe src="${embed.src}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"></iframe>`;
-    }else{
-      const attrs=[];
+    } else {
+      const attrs=['playsinline'];
       if(st.autoplay)attrs.push('autoplay');
       if(st.loop)attrs.push('loop');
       if(st.muted)attrs.push('muted');
-      attrs.push('playsinline');
       if(st.hideSource)attrs.push('controlslist="nodownload nofullscreen noremoteplayback"');
       mediaEl=`  <video src="${embed.src}" ${attrs.join(' ')} style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" id="vv-vid"></video>`;
     }
   }
 
   const isDirectVideo=embed&&embed.type==='video';
-
-  // Controls for viewers: mute top-left always, play+scrub appear on hover/tap only
-  const hoverControlsHTML=st.hoverControls?`
-  <div id="vv-ctrl" style="position:absolute;inset:0;z-index:6;pointer-events:none;">
-    <button id="vv-mute" style="position:absolute;top:10px;left:10px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;opacity:0;transition:opacity 0.2s;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-    </button>
-    <button id="vv-play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;opacity:0;transition:opacity 0.2s;">
-      <svg id="vv-play-icon" width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="${st.autoplay?'M6 19h4V5H6v14zm8-14v14h4V5h-4z':'M8 5v14l11-7z'}"/></svg>
-    </button>
-    <div id="vv-bar-wrap" style="position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;align-items:flex-end;pointer-events:auto;opacity:0;transition:opacity 0.2s;">
-      <div id="vv-bar" style="width:100%;height:4px;background:rgba(255,255,255,0.3);cursor:pointer;position:relative;">
-        <div id="vv-prog" style="height:100%;width:0%;background:#ffffff;pointer-events:none;"></div>
-      </div>
-    </div>
-  </div>`:'';
-
-  const hoverJS=st.hoverControls&&isDirectVideo?`
+  const hoverJS=(st.hoverControls&&isDirectVideo)?`
 <script>
 (function(){
   var outer=document.currentScript.previousElementSibling;
@@ -363,47 +468,29 @@ function renderCode(){
   var ctrl=outer.querySelector('#vv-ctrl');
   var muteBtn=outer.querySelector('#vv-mute');
   var playBtn=outer.querySelector('#vv-play');
-  var playIcon=outer.querySelector('#vv-play-icon');
-  var barWrap=outer.querySelector('#vv-bar-wrap');
   var bar=outer.querySelector('#vv-bar');
   var prog=outer.querySelector('#vv-prog');
   if(!vid||!ctrl)return;
-  var playing=${st.autoplay};
-  var muted=${st.muted};
-  var hideTimer=null;
-  function showControls(){
-    muteBtn.style.opacity='1';
-    playBtn.style.opacity='1';
-    barWrap.style.opacity='1';
-    ctrl.style.pointerEvents='auto';
-    clearTimeout(hideTimer);
-  }
-  function hideControls(){
-    muteBtn.style.opacity='0';
-    playBtn.style.opacity='0';
-    barWrap.style.opacity='0';
-    ctrl.style.pointerEvents='none';
-  }
-  function scheduleHide(){clearTimeout(hideTimer);hideTimer=setTimeout(hideControls,2500);}
-  outer.addEventListener('mouseenter',showControls);
-  outer.addEventListener('mouseleave',hideControls);
-  outer.addEventListener('touchstart',function(){if(muteBtn.style.opacity!=='1'){showControls();scheduleHide();}},{passive:true});
-  outer.addEventListener('touchend',scheduleHide,{passive:true});
-  function updPlayIcon(){playIcon.innerHTML=playing?'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>':'<path d="M8 5v14l11-7z"/>';}
-  function updMuteIcon(){muteBtn.innerHTML=muted?'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';}
-  playBtn.addEventListener('click',function(e){e.stopPropagation();playing?vid.pause():vid.play();playing=!playing;updPlayIcon();scheduleHide();});
-  muteBtn.addEventListener('click',function(e){e.stopPropagation();muted=!muted;vid.muted=muted;updMuteIcon();scheduleHide();});
+  function show(){ctrl.style.opacity='1';ctrl.style.pointerEvents='auto';}
+  function hide(){ctrl.style.opacity='0';ctrl.style.pointerEvents='none';}
+  outer.addEventListener('mouseenter',show);
+  outer.addEventListener('mouseleave',hide);
+  outer.addEventListener('touchstart',function(){ctrl.style.opacity==='1'?hide():show();},{passive:true});
+  var playing=${st.autoplay};var muted=${st.muted};
+  function updPlay(){playBtn.innerHTML=playing?'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';}
+  function updMute(){muteBtn.innerHTML=muted?'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';}
+  playBtn.addEventListener('click',function(){playing?vid.pause():vid.play();playing=!playing;updPlay();});
+  muteBtn.addEventListener('click',function(){muted=!muted;vid.muted=muted;updMute();});
   vid.addEventListener('timeupdate',function(){if(vid.duration)prog.style.width=(vid.currentTime/vid.duration*100)+'%';});
-  bar.addEventListener('click',function(e){var rect=bar.getBoundingClientRect();vid.currentTime=((e.clientX-rect.left)/rect.width)*vid.duration;});
-  bar.addEventListener('touchstart',function(e){var t=e.touches[0];var rect=bar.getBoundingClientRect();vid.currentTime=((t.clientX-rect.left)/rect.width)*vid.duration;scheduleHide();},{passive:true});
-  updPlayIcon();updMuteIcon();
+  bar.addEventListener('click',function(e){var r=bar.getBoundingClientRect();vid.currentTime=((e.clientX-r.left)/r.width)*vid.duration;});
+  updPlay();updMute();
 })();
 <\/script>`:'';
 
   const code=`<!-- Vertical Video Embed -->
 <div style="display:flex;justify-content:center;padding:1rem 0;">
-  <div id="vv-outer" style="position:relative;width:100%;max-width:${st.maxw}px;aspect-ratio:9/16;background:${st.bgColor};border-radius:${r}px;overflow:hidden;${extra}">${iphoneHTML}
-${mediaEl}${hoverControlsHTML}
+  <div id="vv-outer" style="${containerStyle}">${iphoneDecor}
+${mediaEl}${controlsHTML}
   </div>
 </div>${hoverJS}`;
 
@@ -411,36 +498,14 @@ ${mediaEl}${hoverControlsHTML}
 }
 
 function copyCode(){
-  const code=document.getElementById('code-out').textContent;
-  const btn=document.getElementById('copy-btn');
-  function markOk(){btn.textContent='Copied!';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy all';btn.classList.remove('ok');},2200);}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(markOk).catch(()=>fallbackCopy(code));}
-  else{fallbackCopy(code);}
-}
-function fallbackCopy(text){
-  const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand('copy');const btn=document.getElementById('copy-btn');btn.textContent='Copied!';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy all';btn.classList.remove('ok');},2200);}catch(e){alert('Please copy the code manually.');}
-  document.body.removeChild(ta);
-}
-
-function resetAll(){
-  Object.assign(st,{url:'',srcType:'url',frame:'none',radius:12,maxw:320,borderW:0,borderColor:'#ffffff',bgColor:'#000000',autoplay:true,loop:true,muted:true,hideSource:true,hoverControls:true});
-  document.getElementById('video-url').value='';
-  document.getElementById('url-lbl').textContent='Direct video URL (.mp4, .webm)';
-  document.getElementById('video-url').placeholder='https://your-video.mp4';
-  document.querySelectorAll('#src-seg .seg-btn').forEach((b,i)=>b.classList.toggle('on',i===0));
-  document.getElementById('frame-group').querySelectorAll('.pill').forEach((b,i)=>b.classList.toggle('on',i===0));
-  document.getElementById('border-color').value='#ffffff';document.getElementById('bc-hex').value='#ffffff';
-  document.getElementById('bg-color').value='#000000';document.getElementById('bg-hex').value='#000000';
-  document.getElementById('bv').textContent='None';
-  document.getElementById('rv').textContent='12px';
-  document.getElementById('wv').textContent='320px';
-  ['ap-pill','lp-pill','mu-pill','hb-pill','hc-pill'].forEach(id=>document.getElementById(id).classList.add('on'));
-  update();
+  navigator.clipboard.writeText(document.getElementById('code-out').textContent).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='Copied!';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='Copy Code';b.classList.remove('ok');},2200);
+  });
 }
 
 update();
 </script>
 </body>
-</html>e
+</html>
