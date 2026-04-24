@@ -8,8 +8,8 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:#fff;font-family:'Manrope',sans-serif;font-size:12px;color:#222;}
 .app{border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;}
-.preview{height:180px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#eef0f3;border-bottom:1px solid #d0d3d8;}
-.settings{background:#FFFFFF;padding:16px 20px;}
+.preview{height:180px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;background-color:#d8d8d8;border-bottom:1px solid #d0d3d8;}
+.settings{background:#ffffff;padding:16px 20px;}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 20px;}
 .sec{margin-bottom:14px;position:relative;}
 .sec h3{font-size:9px;font-weight:500;color:#999;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #dde0e5;display:flex;align-items:center;justify-content:space-between;}
@@ -247,10 +247,20 @@ function generateCode(){
       '.Site-inner, .Site-canvas,\n'+
       '.sqs-layout > .sqs-row:first-child,\n'+
       '.content-wrapper { margin-top: 0 !important; padding-top: 0 !important; }\n\n'
-    :'.header-nav, .header-actions, .header-branding,\n'+
-      '.header-title-nav, .site-navigation,\n'+
-      '.Header-branding, .Header-nav,\n'+
-      '.Header .header-title, .Header .header-nav { display: none !important; }\n\n';
+    :'.header-title,\n'+
+      '.header-branding,\n'+
+      '.header-nav,\n'+
+      '.header-nav-list,\n'+
+      '.header-actions,\n'+
+      '.header-menu,\n'+
+      '.header-burger,\n'+
+      '.burger,\n'+
+      '.mobile-nav,\n'+
+      '.Mobile-bar,\n'+
+      '.Header-menu,\n'+
+      '.Header-nav,\n'+
+      '.Header-branding,\n'+
+      '.Header-actions { display: none !important; }\n\n';
 
   var pushDown=S.sticky&&S.floatNav?'.Site-inner { padding-top: 64px !important; }\n\n':'';
   var pos=S.sticky?'fixed':'absolute';
@@ -259,8 +269,8 @@ function generateCode(){
     :'';
 
   var css='<style>\n'+fontImport+headerCSS+pushDown+
-    '#pnav-wrap {\n  position: '+pos+';\n  top: 16px; left: 0; right: 0;\n  display: flex; justify-content: center;\n  z-index: 9999; pointer-events: none;\n}'+hideCSS+'\n\n'+
-    '#pnav-inner {\n  display: inline-flex; align-items: center;\n  background: '+S.a+';\n  border-radius: '+S.b+'px;\n  padding: '+pv+'px '+ph_right+'px '+pv+'px '+ph_left+'px;\n  border: '+(S.cstroke>0?S.cstroke+'px solid '+S.csc:'none')+';\n  pointer-events: all;\n}\n\n'+
+    '#pnav-wrap {\n  position: '+pos+';\n  top: 16px; left: 0; right: 0;\n  display: flex; justify-content: center;\n  padding: 0 16px;\n  z-index: 9999; pointer-events: none;\n  box-sizing: border-box;\n}'+hideCSS+'\n\n'+
+    '#pnav-inner {\n  display: inline-flex; align-items: center;\n  background: '+S.a+';\n  border-radius: '+S.b+'px;\n  padding: '+pv+'px '+ph_right+'px '+pv+'px '+ph_left+'px;\n  border: '+(S.cstroke>0?S.cstroke+'px solid '+S.csc:'none')+';\n  pointer-events: all;\n  max-width: 100%;\n  flex-wrap: wrap;\n  box-sizing: border-box;\n}\n\n'+
     '#pnav-brand {\n  font-family: '+ff+'; font-size: '+S.i+'px; font-weight: 500;\n  color: '+S.j+'; text-decoration: none;\n  padding: 7px 0; margin-right: '+S.gap+'px;\n  white-space: nowrap; display: block;\n}\n'+
     '#pnav-brand:hover { opacity: 0.75; }\n\n'+
     '.pnav-link {\n  font-family: '+ff+'; font-size: '+S.k+'px; font-weight: 400;\n  padding: 6px 14px; color: '+S.l+';\n  text-decoration: none; border-radius: '+S.e+'px;\n  white-space: nowrap; transition: opacity 0.15s; border: none;\n}\n'+
