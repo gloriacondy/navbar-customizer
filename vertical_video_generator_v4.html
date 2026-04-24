@@ -1,0 +1,443 @@
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F2F0EB;
+  --surface:#FFFFFF;
+  --ink:#111111;
+  --ink2:#555555;
+  --ink3:#999999;
+  --border:#D0CEC8;
+  --accent:#111111;
+  --accent-fg:#FFFFFF;
+  --green:#1D9E75;
+  --radius:10px;
+  --mono:'DM Mono',monospace;
+  --sans:'Manrope',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);}
+.wrap{padding:1.25rem;max-width:900px;}
+
+.hd{margin-bottom:1.25rem;}
+.hd-title{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);margin-bottom:4px;}
+.hd-sub{font-family:var(--sans);font-size:13px;color:var(--ink2);}
+
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:1rem;align-items:start;}
+@media(max-width:620px){.cols{grid-template-columns:1fr;}}
+
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem;}
+.card:last-child{margin-bottom:0;}
+.card-hd{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);padding:.65rem 1rem;background:#F8F7F4;border-bottom:1.5px solid var(--border);}
+
+.body{padding:.9rem 1rem;}
+
+.field{margin-bottom:.8rem;}
+.field:last-child{margin-bottom:0;}
+.lbl{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);margin-bottom:5px;display:block;}
+.hint{font-family:var(--sans);font-size:11px;color:var(--ink3);margin-top:4px;}
+
+input[type="url"],input[type="text"]{
+  width:100%;font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:7px;padding:7px 10px;outline:none;
+}
+input[type="url"]:focus,input[type="text"]:focus{border-color:var(--ink);}
+
+.seg{display:flex;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;}
+.seg-btn{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:6px 4px;border:none;background:transparent;color:var(--ink2);cursor:pointer;border-right:1.5px solid var(--border);transition:all .12s;}
+.seg-btn:last-child{border-right:none;}
+.seg-btn.on{background:var(--ink);color:#fff;}
+.seg-btn:hover:not(.on){background:#F0EEE9;}
+
+.pill-group{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);color:var(--ink2);cursor:pointer;transition:all .12s;}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+.pill:hover:not(.on){background:#F0EEE9;border-color:#bbb;}
+
+.slider-row{display:flex;gap:10px;align-items:center;}
+.slider-row input[type="range"]{flex:1;accent-color:var(--ink);height:4px;}
+.slider-val{font-family:var(--mono);font-size:12px;color:var(--ink2);min-width:40px;text-align:right;}
+
+.color-row{display:flex;align-items:center;gap:10px;}
+.color-swatch{width:32px;height:32px;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;padding:2px;background:none;}
+.color-hex{font-family:var(--mono);font-size:12px;color:var(--ink2);}
+
+.preview-stage{background:#2A2A2A;border-radius:8px;display:flex;align-items:center;justify-content:center;min-height:300px;padding:1.5rem;position:relative;}
+.video-wrap{position:relative;overflow:hidden;flex-shrink:0;}
+.video-fill{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.v-blocker{position:absolute;inset:0;z-index:10;}
+
+.code-block{font-family:var(--mono);font-size:11px;color:var(--ink);background:#F8F7F4;border:1.5px solid var(--border);border-radius:8px;padding:.9rem;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.65;margin-bottom:.75rem;}
+
+.copy-btn{width:100%;padding:10px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;background:var(--ink);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:background .15s;}
+.copy-btn:hover{background:#333;}
+.copy-btn.ok{background:var(--green);}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;}
+.toggle-row + .toggle-row{border-top:1px solid #F0EEE9;}
+.toggle-lbl{font-family:var(--sans);font-size:13px;color:var(--ink);}
+.toggle-desc{font-family:var(--sans);font-size:11px;color:var(--ink3);margin-top:2px;}
+.sw{position:relative;width:40px;height:22px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;position:absolute;}
+.sw-track{position:absolute;inset:0;background:#D0CEC8;border-radius:11px;cursor:pointer;transition:background .2s;}
+.sw input:checked + .sw-track{background:var(--ink);}
+.sw-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none;}
+.sw input:checked ~ .sw-thumb{transform:translateX(18px);}
+</style>
+
+<div class="wrap">
+  <div class="hd">
+    <div class="hd-title">Vertical Video Embed Generator</div>
+    <div class="hd-sub">Configure your video, copy the code, paste into a Squarespace code block.</div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="card">
+        <div class="card-hd">Video Source</div>
+        <div class="body">
+          <div class="field">
+            <div class="seg" id="src-seg">
+              <button class="seg-btn on" onclick="setSrc('url',0)">Direct URL</button>
+              <button class="seg-btn" onclick="setSrc('youtube',1)">YouTube</button>
+              <button class="seg-btn" onclick="setSrc('vimeo',2)">Vimeo</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl" id="url-lbl">Direct video URL (.mp4, .webm)</label>
+            <input type="url" id="video-url" placeholder="https://your-video.mp4" oninput="update()">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Frame</div>
+        <div class="body">
+          <div class="field">
+            <label class="lbl">Style</label>
+            <div class="pill-group" id="frame-group">
+              <button class="pill on" onclick="pick('frame-group',this);st.frame='none';update()">None</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='iphone';update()">iPhone</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='minimal';update()">Minimal border</button>
+              <button class="pill" onclick="pick('frame-group',this);st.frame='shadow';update()">Drop shadow</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Corner radius</label>
+            <div class="slider-row">
+              <input type="range" min="0" max="40" value="12" step="1" oninput="st.radius=+this.value;document.getElementById('rv').textContent=this.value+'px';update()">
+              <span class="slider-val" id="rv">12px</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Max width</label>
+            <div class="slider-row">
+              <input type="range" min="160" max="500" value="320" step="10" oninput="st.maxw=+this.value;document.getElementById('wv').textContent=this.value+'px';update()">
+              <span class="slider-val" id="wv">320px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Border &amp; Colors</div>
+        <div class="body">
+          <div class="field">
+            <label class="lbl">Video border</label>
+            <div class="pill-group" id="border-group">
+              <button class="pill on" onclick="pick('border-group',this);st.border='none';showBorderColor();update()">None</button>
+              <button class="pill" onclick="pick('border-group',this);st.border='thin';showBorderColor();update()">Thin</button>
+              <button class="pill" onclick="pick('border-group',this);st.border='medium';showBorderColor();update()">Medium</button>
+              <button class="pill" onclick="pick('border-group',this);st.border='thick';showBorderColor();update()">Thick</button>
+            </div>
+          </div>
+          <div class="field" id="bc-field" style="display:none;">
+            <label class="lbl">Border color</label>
+            <div class="color-row">
+              <input class="color-swatch" type="color" id="border-color" value="#ffffff" oninput="st.borderColor=this.value;document.getElementById('bc-hex').textContent=this.value;update()">
+              <span class="color-hex" id="bc-hex">#ffffff</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Video background color</label>
+            <div class="color-row">
+              <input class="color-swatch" type="color" id="bg-color" value="#000000" oninput="st.bgColor=this.value;document.getElementById('bg-hex').textContent=this.value;update()">
+              <span class="color-hex" id="bg-hex">#000000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Playback &amp; Privacy</div>
+        <div class="body">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">Autoplay</div>
+              <div class="toggle-desc">Starts playing when page loads (requires muted)</div>
+            </div>
+            <label class="sw">
+              <input type="checkbox" id="sw-auto" checked onchange="st.autoplay=this.checked;if(this.checked){document.getElementById('sw-mute').checked=true;st.muted=true;}update()">
+              <div class="sw-track"></div>
+              <div class="sw-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">Loop</div>
+              <div class="toggle-desc">Restarts automatically when finished</div>
+            </div>
+            <label class="sw">
+              <input type="checkbox" id="sw-loop" checked onchange="st.loop=this.checked;update()">
+              <div class="sw-track"></div>
+              <div class="sw-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">Muted</div>
+              <div class="toggle-desc">Required for autoplay in most browsers</div>
+            </div>
+            <label class="sw">
+              <input type="checkbox" id="sw-mute" checked onchange="st.muted=this.checked;update()">
+              <div class="sw-track"></div>
+              <div class="sw-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">Hide source controls</div>
+              <div class="toggle-desc">Removes YouTube/Vimeo branding &amp; links</div>
+            </div>
+            <label class="sw">
+              <input type="checkbox" id="sw-hide" checked onchange="st.hideSource=this.checked;update()">
+              <div class="sw-track"></div>
+              <div class="sw-thumb"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-lbl">Always show play &amp; mute buttons</div>
+              <div class="toggle-desc">Visible overlay controls — works in Squarespace edit mode</div>
+            </div>
+            <label class="sw">
+              <input type="checkbox" id="sw-ctrl" checked onchange="st.showControls=this.checked;update()">
+              <div class="sw-track"></div>
+              <div class="sw-thumb"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-hd">Preview</div>
+        <div class="body" style="padding:.75rem;">
+          <div class="preview-stage" id="preview-stage">
+            <div style="position:relative;" id="phone-shell">
+              <div class="video-wrap" id="vc">
+                <div class="v-blocker"></div>
+                <div id="vi" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div id="ctrl-preview" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:20;">
+                  <button style="width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Play/Pause">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+                  </button>
+                  <button style="width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.55);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Mute/Unmute">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">Embed Code — Paste into Squarespace Code Block</div>
+        <div class="body">
+          <div class="code-block" id="code-out"></div>
+          <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const st={url:'',srcType:'url',frame:'none',radius:12,maxw:320,border:'none',borderColor:'#ffffff',bgColor:'#000000',autoplay:true,loop:true,muted:true,hideSource:true,showControls:true};
+
+function pick(gid,el){document.getElementById(gid).querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+
+function setSrc(t,idx){
+  st.srcType=t;
+  const btns=document.querySelectorAll('#src-seg .seg-btn');
+  btns.forEach((b,i)=>b.classList.toggle('on',i===idx));
+  const lbl=document.getElementById('url-lbl'),inp=document.getElementById('video-url');
+  if(t==='youtube'){lbl.textContent='YouTube video URL';inp.placeholder='https://youtu.be/dQw4w9WgXcQ';}
+  else if(t==='vimeo'){lbl.textContent='Vimeo video URL';inp.placeholder='https://vimeo.com/123456789';}
+  else{lbl.textContent='Direct video URL (.mp4, .webm)';inp.placeholder='https://your-video.mp4';}
+  update();
+}
+
+function showBorderColor(){document.getElementById('bc-field').style.display=st.border==='none'?'none':'block';}
+
+function update(){
+  st.url=document.getElementById('video-url').value.trim();
+  renderPreview();
+  renderCode();
+}
+
+function renderPreview(){
+  const vc=document.getElementById('vc'),vi=document.getElementById('vi');
+  const cp=document.getElementById('ctrl-preview');
+  const w=Math.min(st.maxw,200),h=Math.round(w*(16/9));
+  vc.style.width=w+'px';vc.style.height=h+'px';
+  const r=st.frame==='iphone'?28:st.radius;
+  vc.style.borderRadius=r+'px';
+  vi.style.background=st.bgColor;
+  vc.style.border='none';vc.style.boxShadow='none';
+  const shell=document.getElementById('phone-shell');
+  shell.querySelectorAll('.pn,.pb').forEach(e=>e.remove());
+  if(st.frame==='iphone'){
+    vc.style.border='3px solid #1a1a1a';
+    vc.style.boxShadow='0 0 0 6px #2a2a2a,0 0 0 9px #3a3a3a';
+    const n=document.createElement('div');n.className='pn';
+    n.style.cssText='position:absolute;top:0;left:50%;transform:translateX(-50%);width:60px;height:15px;background:#1a1a1a;border-radius:0 0 9px 9px;z-index:15;';
+    const hb=document.createElement('div');hb.className='pb';
+    hb.style.cssText='position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:55px;height:4px;background:rgba(0,0,0,0.25);border-radius:2px;z-index:15;';
+    vc.appendChild(n);vc.appendChild(hb);
+  }else if(st.frame==='shadow'){vc.style.boxShadow='0 12px 40px rgba(0,0,0,0.5)';}
+  else if(st.frame==='minimal'){vc.style.border='1px solid rgba(255,255,255,0.2)';}
+  const bmap={thin:'1.5px',medium:'3px',thick:'6px'};
+  if(st.border!=='none')vc.style.border=`${bmap[st.border]} solid ${st.borderColor}`;
+  cp.style.display=st.showControls?'flex':'none';
+}
+
+function getEmbed(){
+  const url=st.url;if(!url)return null;
+  if(st.srcType==='youtube'){
+    const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+    const id=m?m[1]:url.trim();
+    const p=['playsinline=1','rel=0','modestbranding=1','enablejsapi=1'];
+    if(st.autoplay)p.push('autoplay=1');
+    if(st.loop)p.push('loop=1','playlist='+id);
+    if(st.muted)p.push('mute=1');
+    if(st.hideSource)p.push('controls=0','iv_load_policy=3','disablekb=1');
+    return{type:'iframe',src:`https://www.youtube.com/embed/${id}?`+p.join('&'),id};
+  }
+  if(st.srcType==='vimeo'){
+    const m=url.match(/vimeo\.com\/(\d+)/);
+    const id=m?m[1]:url.replace(/\D/g,'');
+    const p=['playsinline=1','transparent=0'];
+    if(st.hideSource)p.push('background=1');
+    if(st.autoplay)p.push('autoplay=1');
+    if(st.loop)p.push('loop=1');
+    if(st.muted)p.push('muted=1');
+    return{type:'iframe',src:`https://player.vimeo.com/video/${id}?`+p.join('&'),id};
+  }
+  return{type:'video',src:url};
+}
+
+function renderCode(){
+  const embed=getEmbed();
+  const r=st.frame==='iphone'?28:st.radius;
+  let extra='';
+  if(st.frame==='iphone')extra+=`\n    box-shadow:0 0 0 6px #2a2a2a,0 0 0 9px #3a3a3a;\n    border:3px solid #1a1a1a;`;
+  if(st.frame==='shadow')extra+=`\n    box-shadow:0 12px 40px rgba(0,0,0,0.5);`;
+  if(st.frame==='minimal')extra+=`\n    border:1px solid rgba(255,255,255,0.2);`;
+  const bmap={thin:'1.5px',medium:'3px',thick:'6px'};
+  if(st.border!=='none')extra+=`\n    border:${bmap[st.border]} solid ${st.borderColor};`;
+
+  const iphoneHTML=st.frame==='iphone'?`
+  <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:60px;height:15px;background:#1a1a1a;border-radius:0 0 9px 9px;z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:55px;height:4px;background:rgba(0,0,0,0.25);border-radius:2px;z-index:2;pointer-events:none;"></div>`:'';
+
+  let mediaEl='  <!-- Paste your video URL above to generate code -->';
+
+  const ctrlsJS=st.showControls?`
+<script>
+(function(){
+  var wrap=document.currentScript.previousElementSibling;
+  var playBtn=wrap.querySelector('.vv-play');
+  var muteBtn=wrap.querySelector('.vv-mute');
+  var vid=wrap.querySelector('video');
+  var iframe=wrap.querySelector('iframe');
+  var playing=${st.autoplay};
+  var muted=${st.muted};
+  function updPlay(){playBtn.innerHTML=playing?'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';}
+  function updMute(){muteBtn.innerHTML=muted?'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>':'<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';}
+  if(vid){
+    vid.muted=muted;
+    playBtn.addEventListener('click',function(){playing?vid.pause():vid.play();playing=!playing;updPlay();});
+    muteBtn.addEventListener('click',function(){muted=!muted;vid.muted=muted;updMute();});
+  }
+  updPlay();updMute();
+})();
+<\/script>`:'';
+
+  if(embed){
+    if(embed.type==='iframe'){
+      mediaEl=`  <iframe
+    src="${embed.src}"
+    frameborder="0"
+    allow="autoplay; fullscreen; picture-in-picture"
+    allowfullscreen
+    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+  ></iframe>`;
+    }else{
+      const attrs=[];
+      if(st.autoplay)attrs.push('autoplay');
+      if(st.loop)attrs.push('loop');
+      if(st.muted)attrs.push('muted');
+      attrs.push('playsinline');
+      if(st.hideSource)attrs.push('controlslist="nodownload nofullscreen noremoteplayback"');
+      mediaEl=`  <video
+    src="${embed.src}"
+    ${attrs.join('\n    ')}
+    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"
+  ></video>`;
+    }
+  }
+
+  const ctrlsHTML=st.showControls?`
+  <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;">
+    <button class="vv-play" style="width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="${st.autoplay?'M6 19h4V5H6v14zm8-14v14h4V5h-4z':'M8 5v14l11-7z'}"/></svg>
+    </button>
+    <button class="vv-mute" style="width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="${st.muted?'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z':'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z'}"/></svg>
+    </button>
+  </div>${embed&&embed.type==='video'?ctrlsJS:''}`:'';
+
+  const code=`<!-- Vertical Video Embed -->
+<div style="display:flex;justify-content:center;padding:1rem 0;">
+  <div style="
+    position:relative;
+    width:100%;
+    max-width:${st.maxw}px;
+    aspect-ratio:9/16;
+    background:${st.bgColor};
+    border-radius:${r}px;
+    overflow:hidden;${extra}
+  ">${iphoneHTML}
+${mediaEl}${ctrlsHTML}
+  </div>
+</div>`;
+
+  document.getElementById('code-out').textContent=code;
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('code-out').textContent).then(()=>{
+    const b=document.getElementById('copy-btn');
+    b.textContent='Copied!';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='Copy Code';b.classList.remove('ok');},2200);
+  });
+}
+
+update();
+</script>
