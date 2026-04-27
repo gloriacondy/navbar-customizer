@@ -274,14 +274,14 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
               <div class="color-unit">
                 <span class="cu-lbl">Icon Color</span>
                 <div class="cu-row">
-                  <input type="color" id="ctrl-icon-color" value="#ffffff" oninput="st.ctrlIconColor=this.value;update()">
+                  <input type="color" id="ctrl-icon-color" value="#ffffff" oninput="st.ctrlIconColor=this.value;document.getElementById('ctrl-icon-hex').textContent=this.value;syncCtrlBtnColors();renderCode()">
                   <span class="chex" id="ctrl-icon-hex">#ffffff</span>
                 </div>
               </div>
               <div class="color-unit">
                 <span class="cu-lbl">Bg Color</span>
                 <div class="cu-row">
-                  <input type="color" id="ctrl-bg-color" value="#000000" oninput="st.ctrlBgColor=this.value;update()">
+                  <input type="color" id="ctrl-bg-color" value="#000000" oninput="st.ctrlBgColor=this.value;document.getElementById('ctrl-bg-hex').textContent=this.value;syncCtrlBtnColors();renderCode()">
                   <span class="chex" id="ctrl-bg-hex">#000000</span>
                 </div>
               </div>
@@ -289,7 +289,7 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
             <div style="margin-top:8px;">
               <label class="lbl">Bg Opacity</label>
               <div class="slider-row">
-                <input type="range" min="0" max="100" value="60" step="5" id="ctrl-bg-opacity" oninput="st.ctrlBgOpacity=+this.value;document.getElementById('cbov').textContent=this.value+'%';update()">
+                <input type="range" min="0" max="100" value="60" step="5" id="ctrl-bg-opacity" oninput="st.ctrlBgOpacity=+this.value;document.getElementById('cbov').textContent=this.value+'%';syncCtrlBtnColors();renderCode()">
                 <span class="sval" id="cbov">60%</span>
               </div>
             </div>
@@ -523,8 +523,26 @@ function iconSvg(path, size, color){
 }
 
 /* ══════════════════════════════════════
-   PREVIEW RENDERER
+   SYNC CONTROL BUTTON COLOURS (no full rebuild)
 ══════════════════════════════════════ */
+function syncCtrlBtnColors(){
+  const btnBg = hexToRgba(st.ctrlBgColor, st.ctrlBgOpacity);
+  const pvMute = document.getElementById('pv-mute');
+  const pvPlay = document.getElementById('pv-play');
+  pvMute.style.background = btnBg;
+  pvPlay.style.background = btnBg;
+  // Re-render icons with new colour (preserve play/pause state)
+  const vid = document.getElementById('vi').querySelector('video');
+  if(vid){
+    pvPlay.innerHTML = iconSvg(vid.paused ? SVG.playE : SVG.pauseE, 14, st.ctrlIconColor);
+    pvMute.innerHTML = iconSvg(vid.muted  ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor);
+  } else {
+    pvPlay.innerHTML = iconSvg(SVG.playE,  14, st.ctrlIconColor);
+    pvMute.innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
+  }
+}
+
+
 function renderPreview(force){
   const shell  = document.getElementById('phone-shell');
   const vc     = document.getElementById('vc');
@@ -883,11 +901,23 @@ ${mediaEl}
    COPY
 ══════════════════════════════════════ */
 function copyCode(){
-  navigator.clipboard.writeText(document.getElementById('code-out').textContent).then(()=>{
-    const b = document.getElementById('copy-btn');
-    b.textContent = 'Copied!'; b.classList.add('ok');
-    setTimeout(()=>{ b.textContent='Copy Code'; b.classList.remove('ok'); }, 2200);
-  });
+  const text = document.getElementById('code-out').textContent;
+  const b = document.getElementById('copy-btn');
+  function flash(){ b.textContent='Copied!'; b.classList.add('ok'); setTimeout(()=>{ b.textContent='Copy Code'; b.classList.remove('ok'); }, 2200); }
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(flash).catch(()=>fallbackCopy(text, flash));
+  } else {
+    fallbackCopy(text, flash);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try{ document.execCommand('copy'); cb(); } catch(e){}
+  document.body.removeChild(ta);
 }
 
 /* ══════════════════════════════════════
@@ -932,6 +962,7 @@ function copyCode(){
 
 document.getElementById('pv-mute').innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
 document.getElementById('pv-play').innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
+updateCtrlRow();
 update();
 </script>
 </body>
