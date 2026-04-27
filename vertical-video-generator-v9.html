@@ -488,11 +488,10 @@ function update(){
 }
 
 function updateMutePreview(){
-  st.muted = !st.muted;
+  // st.muted already toggled by the pill onclick — just sync the video element
   const vid = document.getElementById('vi').querySelector('video');
   if(vid){
     vid.muted = st.muted;
-    document.getElementById('pv-mute').innerHTML = iconSvg(st.muted ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor);
   }
   renderCode();
   renderPreview(false);
@@ -617,7 +616,6 @@ function renderPreview(force){
 
   if(st.hoverControls){
     ctrlOv.style.display = 'block';
-    ctrlOv.style.pointerEvents = 'none';
     if(st.alwaysShow && st.srcType === 'url'){
       ctrlOv.style.opacity = '1';
     } else {
@@ -715,7 +713,7 @@ function buildCode(){
   /* inner container style */
   let vcStyle = 'position:relative;aspect-ratio:9/16;overflow:hidden;background:#000;';
   if(st.frame === 'iphone'){
-    vcStyle += `width:${st.maxw}px;border-radius:16px;`;
+    vcStyle += `width:${st.maxw}px;border-radius:${Math.round(16 * st.maxw / 148)}px;`;
     if(st.borderW>0) vcStyle += `border:${st.borderW}px solid ${st.borderColor};`;
   } else if(st.frame === 'minimal'){
     vcStyle += `width:100%;max-width:${st.maxw}px;border-radius:${st.radius}px;`;
@@ -729,10 +727,21 @@ function buildCode(){
   let shellOpen = '', shellClose = '';
   if(st.frame === 'iphone'){
     const sf = st.shadow ? `filter:${shadowFilt};` : '';
+    // Scale shell proportionally from preview size (148px) to actual maxw
+    const scale = st.maxw / 148;
+    const padTop    = Math.round(28 * scale);
+    const padSide   = Math.round(7  * scale);
+    const padBot    = Math.round(18 * scale);
+    const bradius   = Math.round(28 * scale);
+    const vcBradius = Math.round(16 * scale);
+    const nW = Math.round(46 * scale);
+    const nTop = Math.round(8 * scale);
+    const bW  = Math.round(38 * scale);
+    const bBot = Math.round(5 * scale);
     shellOpen = `
-  <div style="display:inline-block;background:${cc};border-radius:28px;padding:28px 7px 18px;position:relative;border:2px solid ${dark};${sf}">
-    <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:46px;height:8px;background:${st.notchColor};border-radius:4px;z-index:3;pointer-events:none;"></div>
-    <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:38px;height:4px;background:${st.barColor};border-radius:2px;z-index:3;pointer-events:none;"></div>`;
+  <div style="display:inline-block;background:${cc};border-radius:${bradius}px;padding:${padTop}px ${padSide}px ${padBot}px;position:relative;border:2px solid ${dark};${sf}">
+    <div style="position:absolute;top:${nTop}px;left:50%;transform:translateX(-50%);width:${nW}px;height:8px;background:${st.notchColor};border-radius:4px;z-index:3;pointer-events:none;"></div>
+    <div style="position:absolute;bottom:${bBot}px;left:50%;transform:translateX(-50%);width:${bW}px;height:4px;background:${st.barColor};border-radius:2px;z-index:3;pointer-events:none;"></div>`;
     shellClose = `\n  </div>`;
   }
 
