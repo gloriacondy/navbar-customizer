@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#fff;font-family:'Manrope',sans-serif;font-size:12px;color:#222;}
+
+.app{border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;}
+.cols{display:flex;align-items:stretch;}
+@media(max-width:640px){.cols{flex-direction:column;}}
+
+/* Left pane */
+.settings{flex:1;min-width:0;background:#fff;padding:16px 20px;border-right:1px solid #d0d3d8;display:flex;flex-direction:column;gap:12px;}
+
+/* Section cards */
+.sec{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:visible;}
+.sec-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;position:relative;}
+.sec-body{padding:12px;background:#fff;border-radius:0 0 8px 8px;}
+.field{margin-bottom:10px;}
+.field:last-child{margin-bottom:0;}
+.lbl{font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;color:#444;margin-bottom:5px;display:block;}
+
+/* FAQ tooltip trigger */
+.faq-tip{font-family:'Manrope',sans-serif;font-size:9px;font-style:italic;color:#bbb;cursor:default;white-space:nowrap;}
+
+/* Branding tooltip */
+.info-wrap{display:inline-flex;align-items:center;}
+.info-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#e0e0e0;color:#888;font-size:8px;font-family:'DM Mono',monospace;cursor:default;margin-left:5px;flex-shrink:0;}
+
+/* Shared floating tooltip */
+#float-tip{position:fixed;z-index:9999;width:220px;background:#1e1e1e;color:#ccc;font-family:'Manrope',sans-serif;font-size:10px;line-height:1.5;padding:10px 12px;border-radius:7px;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:none;display:none;}
+
+/* URL row */
+.url-row{display:flex;gap:6px;align-items:stretch;}
+.url-row input[type="url"]{flex:1;font-family:'Manrope',sans-serif;font-size:12px;color:#111;background:#fff;border:1px solid #ccc;border-radius:5px;padding:5px 8px;outline:none;}
+.url-row input[type="url"]:focus{border-color:#888;}
+.url-row input[type="url"]::placeholder{color:#bbb;}
+.preview-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;background:#222;color:#fff;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s;}
+.preview-btn:hover{background:#444;}
+.preview-btn.remove{background:#c0392b;}
+.preview-btn.remove:hover{background:#a93226;}
+.preview-btn.ok{background:#1D9E75;}
+
+/* Segment */
+.seg{display:flex;border:1px solid #ccc;border-radius:5px;overflow:hidden;}
+.seg-btn{flex:1;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:6px 4px;border:none;background:#fff;color:#888;cursor:pointer;border-right:1px solid #ccc;}
+.seg-btn:last-child{border-right:none;}
+.seg-btn.on{background:#222;color:#fff;}
+.seg-btn:hover:not(.on){background:#f0f0f0;color:#444;}
+
+/* Pills */
+.pill-group{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;}
+.pill.on{background:#222;color:#fff;border-color:#222;}
+.pill:hover:not(.on){background:#f0f0f0;color:#444;}
+
+/* Toggle pills */
+.tpill-group{display:flex;gap:6px;flex-wrap:wrap;}
+.tpill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;border:1px solid #ccc;border-radius:20px;background:#fff;color:#888;cursor:pointer;transition:all .12s;text-align:center;}
+.tpill.on{background:#222;color:#fff;border-color:#222;}
+.tpill:hover:not(.on){background:#f0f0f0;color:#444;}
+
+/* Slider */
+.slider-row{display:flex;gap:8px;align-items:center;}
+.slider-row input[type="range"]{flex:1;accent-color:#222;height:3px;}
+.sval{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;min-width:36px;text-align:right;}
+
+/* Color */
+.color-swatch-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.color-swatch-row .lbl-sm{font-family:'Manrope',sans-serif;font-size:10px;color:#777;margin-right:2px;}
+input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #ccc;cursor:pointer;padding:1px;background:#fff;}
+.chex{font-family:'DM Mono',monospace;font-size:10px;color:#888;}
+
+/* Multi-color row */
+.multi-color-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:4px;}
+.color-unit{display:flex;flex-direction:column;gap:4px;}
+.color-unit .cu-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#aaa;}
+.color-unit .cu-row{display:flex;align-items:center;gap:5px;}
+
+/* Toggle switch */
+.sw-row{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.sw-track{width:36px;height:20px;background:#ccc;border-radius:10px;position:relative;transition:background .2s;flex-shrink:0;}
+.sw-track.on{background:#222;}
+.sw-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.sw-track.on .sw-knob{left:18px;}
+.sw-lbl{font-family:'Manrope',sans-serif;font-size:11px;color:#555;}
+
+/* Sub-field (indented under a toggle) */
+.sub-field{margin-top:8px;padding-left:46px;}
+
+/* Right pane */
+.right-pane{width:300px;flex-shrink:0;display:flex;flex-direction:column;}
+@media(max-width:640px){.right-pane{width:100%;}}
+.preview-area{flex-shrink:0;}
+.preview-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;}
+.checker{display:flex;align-items:center;justify-content:center;padding:20px;min-height:300px;background-color:#d8d8d8;background-image:linear-gradient(45deg,#c4c4c4 25%,transparent 25%),linear-gradient(-45deg,#c4c4c4 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#c4c4c4 75%),linear-gradient(-45deg,transparent 75%,#c4c4c4 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;}
+
+/* Code area */
+.code-area{flex:1;display:flex;flex-direction:column;border-top:1px solid #d0d3d8;min-height:0;}
+.code-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;flex-shrink:0;}
+.code-body{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-height:0;}
+.code-pre{font-family:'DM Mono',monospace;font-size:10.5px;color:#d4d4d4;background:#1a1a1a;border-radius:6px;padding:10px 12px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.6;max-height:260px;}
+.copy-btn{width:100%;padding:8px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;background:#222;color:#fff;border:none;border-radius:6px;cursor:pointer;flex-shrink:0;}
+.copy-btn:hover{background:#444;}
+.copy-btn.ok{background:#1D9E75;}
+
+/* Preview control buttons */
+.pctrl{position:absolute;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(2px);}
+</style>
+</head>
+<body>
+<div id="float-tip"></div>
+<div class="app">
+  <div class="cols">
+
+    <!-- ══ LEFT: Settings ══ -->
+    <div class="settings">
+
+      <!-- Video Source -->
+      <div class="sec">
+        <div class="sec-hd">
+          <span>Video Source</span>
+          <span class="faq-tip" data-tip="TikTok and Instagram actively block third-party embedding — their players either refuse to load, strip the video down to a broken shell, or violate platform terms of service. This tool is lean and honest: it gives you a clean, no-storage embed solution that works reliably. For best results, use a direct video URL (.mp4 or .webm), or upload your content to YouTube or Vimeo and embed from there.">Why no TikTok or Instagram? &#9660;</span>
+        </div>
+        <div class="sec-body">
+          <div class="field">
+            <div class="seg" id="src-seg">
+              <button class="seg-btn on" onclick="setSrc('url',0)">Direct URL</button>
+              <button class="seg-btn" onclick="setSrc('youtube',1)">YouTube</button>
+              <button class="seg-btn" onclick="setSrc('vimeo',2)">Vimeo</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl" id="url-lbl">Direct video URL (.mp4, .webm)</label>
+            <div class="url-row">
+              <input type="url" id="video-url" placeholder="https://your-video.mp4">
+              <button class="preview-btn" id="prev-btn" onclick="handlePreviewBtn()">Preview</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frame -->
+      <div class="sec">
+        <div class="sec-hd"><span>Frame</span></div>
+        <div class="sec-body">
+          <div class="field">
+            <label class="lbl">Type</label>
+            <div class="pill-group" id="frame-group">
+              <button class="pill on"  onclick="setFrame('none',this)">None</button>
+              <button class="pill"     onclick="setFrame('minimal',this)">Minimal</button>
+              <button class="pill"     onclick="setFrame('iphone',this)">iPhone</button>
+            </div>
+          </div>
+          <!-- iPhone: case + notch + bar colours in one row -->
+          <div class="field" id="f-case" style="display:none;">
+            <label class="lbl">Frame Colors</label>
+            <div class="multi-color-row">
+              <div class="color-unit">
+                <span class="cu-lbl">Case</span>
+                <div class="cu-row">
+                  <input type="color" id="case-color" value="#1a1a1a" oninput="st.caseColor=this.value;syncIphoneColorDefaults();update()">
+                  <span class="chex" id="case-hex">#1a1a1a</span>
+                </div>
+              </div>
+              <div class="color-unit">
+                <span class="cu-lbl">Notch</span>
+                <div class="cu-row">
+                  <input type="color" id="notch-color" value="#0c0c0c" oninput="st.notchColor=this.value;st.notchAuto=false;update()">
+                  <span class="chex" id="notch-hex">#0c0c0c</span>
+                </div>
+              </div>
+              <div class="color-unit">
+                <span class="cu-lbl">Bar</span>
+                <div class="cu-row">
+                  <input type="color" id="bar-color" value="#323232" oninput="st.barColor=this.value;st.barAuto=false;update()">
+                  <span class="chex" id="bar-hex">#323232</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Corner radius — Minimal only -->
+          <div class="field" id="f-radius" style="display:none;">
+            <label class="lbl">Corner Radius</label>
+            <div class="slider-row">
+              <input type="range" min="0" max="40" value="0" step="1" id="radius-in" oninput="st.radius=+this.value;document.getElementById('rv').textContent=this.value+'px';update()">
+              <span class="sval" id="rv">0px</span>
+            </div>
+          </div>
+          <!-- Max width — always shown -->
+          <div class="field" id="f-maxw">
+            <label class="lbl">Max Width</label>
+            <div class="slider-row">
+              <input type="range" min="160" max="500" value="320" step="10" oninput="st.maxw=+this.value;document.getElementById('wv').textContent=this.value+'px';update()">
+              <span class="sval" id="wv">320px</span>
+            </div>
+          </div>
+          <!-- Border — Minimal & iPhone only -->
+          <div class="field" id="f-border" style="display:none;">
+            <label class="lbl">Border Width</label>
+            <div class="slider-row">
+              <input type="range" min="0" max="12" value="0" step="1" id="border-in" oninput="st.borderW=+this.value;document.getElementById('bv').textContent=this.value===0?'None':this.value+'px';update()">
+              <span class="sval" id="bv">None</span>
+            </div>
+          </div>
+          <div class="field" id="f-bordercol" style="display:none;">
+            <label class="lbl">Border Color</label>
+            <div class="color-swatch-row">
+              <input type="color" id="border-color" value="#ffffff" oninput="st.borderColor=this.value;document.getElementById('bc-hex').textContent=this.value;update()">
+              <span class="chex" id="bc-hex">#ffffff</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shadow — hidden when frame=none -->
+      <div class="sec" id="shadow-sec" style="display:none;">
+        <div class="sec-hd"><span>Shadow</span></div>
+        <div class="sec-body">
+          <div class="sw-row" onclick="toggleShadow()">
+            <div class="sw-track" id="sw-track"><div class="sw-knob"></div></div>
+            <span class="sw-lbl">Drop shadow</span>
+          </div>
+          <div id="shadow-sliders" style="display:none;margin-top:10px;display:none;">
+            <div class="field" style="margin-bottom:8px;">
+              <label class="lbl">Blur</label>
+              <div class="slider-row">
+                <input type="range" min="4" max="80" value="36" step="2" id="sh-blur" oninput="st.shadowBlur=+this.value;document.getElementById('shbv').textContent=this.value+'px';update()">
+                <span class="sval" id="shbv">36px</span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="lbl">Opacity</label>
+              <div class="slider-row">
+                <input type="range" min="0" max="100" value="55" step="5" id="sh-opacity" oninput="st.shadowOpacity=+this.value;document.getElementById('shov').textContent=this.value+'%';update()">
+                <span class="sval" id="shov">55%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playback -->
+      <div class="sec">
+        <div class="sec-hd"><span>Playback</span></div>
+        <div class="sec-body">
+          <div class="field">
+            <label class="lbl">Options — click to toggle on/off</label>
+            <div class="tpill-group">
+              <button class="tpill on" id="tp-autoplay" onclick="togglePill('tp-autoplay');st.autoplay=!st.autoplay;update()">Autoplay</button>
+              <button class="tpill on" id="tp-loop"     onclick="togglePill('tp-loop');st.loop=!st.loop;update()">Loop</button>
+              <button class="tpill on" id="tp-muted"    onclick="togglePill('tp-muted');st.muted=!st.muted;updateMutePreview()">Muted</button>
+              <div class="info-wrap">
+                <button class="tpill on" id="tp-hide" onclick="togglePill('tp-hide');st.hideSource=!st.hideSource;update()">Hide Branding</button>
+                <span class="info-icon" data-tip="YouTube and Vimeo may still briefly show their logo on load or hover. This setting removes controls and watermarks where the embed API allows, but full branding suppression isn't guaranteed.">i</span>
+              </div>
+              <button class="tpill on" id="tp-ctrl" onclick="togglePill('tp-ctrl');st.hoverControls=!st.hoverControls;updateCtrlRow();update()">Controls for Viewers</button>
+            </div>
+          </div>
+          <!-- Always-show toggle: visible only when Controls for Viewers is ON and srcType is url -->
+          <div class="field" id="always-show-field" style="display:none;margin-top:10px;">
+            <div class="sw-row" onclick="toggleAlwaysShow()">
+              <div class="sw-track" id="sw-always"><div class="sw-knob"></div></div>
+              <span class="sw-lbl">Always show controls</span>
+            </div>
+          </div>
+          <!-- Control button styling: visible when Controls for Viewers is ON -->
+          <div class="field" id="ctrl-style-field" style="display:none;margin-top:10px;">
+            <label class="lbl">Button Style</label>
+            <div class="multi-color-row">
+              <div class="color-unit">
+                <span class="cu-lbl">Icon Color</span>
+                <div class="cu-row">
+                  <input type="color" id="ctrl-icon-color" value="#ffffff" oninput="st.ctrlIconColor=this.value;update()">
+                  <span class="chex" id="ctrl-icon-hex">#ffffff</span>
+                </div>
+              </div>
+              <div class="color-unit">
+                <span class="cu-lbl">Bg Color</span>
+                <div class="cu-row">
+                  <input type="color" id="ctrl-bg-color" value="#000000" oninput="st.ctrlBgColor=this.value;update()">
+                  <span class="chex" id="ctrl-bg-hex">#000000</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="lbl">Bg Opacity</label>
+              <div class="slider-row">
+                <input type="range" min="0" max="100" value="60" step="5" id="ctrl-bg-opacity" oninput="st.ctrlBgOpacity=+this.value;document.getElementById('cbov').textContent=this.value+'%';update()">
+                <span class="sval" id="cbov">60%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /settings -->
+
+    <!-- ══ RIGHT: Preview + Code ══ -->
+    <div class="right-pane">
+
+      <!-- Preview -->
+      <div class="preview-area">
+        <div class="preview-hd">Preview</div>
+        <div class="checker" id="checker">
+          <div id="phone-shell" style="position:relative;display:inline-block;">
+            <div id="vc" style="position:relative;overflow:hidden;background:#111;">
+              <div id="vi" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div id="brand-badge" style="position:absolute;top:8px;right:8px;z-index:9;display:none;pointer-events:none;"></div>
+              <div id="ctrl-ov" style="position:absolute;inset:0;z-index:11;display:none;pointer-events:none;">
+                <button id="pv-mute" class="pctrl" style="top:8px;left:8px;width:30px;height:30px;pointer-events:auto;"></button>
+                <button id="pv-play" class="pctrl" style="top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;pointer-events:auto;"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code output -->
+      <div class="code-area">
+        <div class="code-hd">Embed Code — Paste into Squarespace Code Block</div>
+        <div class="code-body">
+          <pre class="code-pre" id="code-out"><!-- Enter a URL above and click Preview --></pre>
+          <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy Code</button>
+        </div>
+      </div>
+
+    </div><!-- /right-pane -->
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+const st = {
+  url:'', srcType:'url',
+  frame:'none', caseColor:'#1a1a1a',
+  notchColor:'#0c0c0c', notchAuto:true,
+  barColor:'#323232', barAuto:true,
+  radius:0, maxw:320,
+  borderW:0, borderColor:'#ffffff',
+  shadow:false, shadowBlur:36, shadowOpacity:55,
+  autoplay:true, loop:true, muted:true, hideSource:true,
+  hoverControls:true, alwaysShow:false,
+  ctrlIconColor:'#ffffff', ctrlBgColor:'#000000', ctrlBgOpacity:60,
+  previewed:false
+};
+
+/* ══════════════════════════════════════
+   SVG ICON STRINGS
+══════════════════════════════════════ */
+const SVG = {
+  play:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>',
+  pause: '<svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>',
+  muted: '<svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+  sound: '<svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+  playE:  "M8 5v14l11-7z",
+  pauseE: "M6 19h4V5H6v14zm8-14v14h4V5h-4z",
+  mutedE: "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z",
+  soundE: "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+};
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+function togglePill(id){ document.getElementById(id).classList.toggle('on'); }
+
+function pick(gid, el){
+  document.getElementById(gid).querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function adjustHex(hex, amt){
+  const h = hex.replace('#','');
+  const r = Math.max(0,Math.min(255,parseInt(h.slice(0,2),16)+amt));
+  const g = Math.max(0,Math.min(255,parseInt(h.slice(2,4),16)+amt));
+  const b = Math.max(0,Math.min(255,parseInt(h.slice(4,6),16)+amt));
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+function hexToRgba(hex, opacity){
+  const h = hex.replace('#','');
+  const r = parseInt(h.slice(0,2),16);
+  const g = parseInt(h.slice(2,4),16);
+  const b = parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${(opacity/100).toFixed(2)})`;
+}
+
+/* When case color changes, auto-update notch/bar if they're still on auto */
+function syncIphoneColorDefaults(){
+  document.getElementById('case-hex').textContent = st.caseColor;
+  if(st.notchAuto){
+    st.notchColor = adjustHex(st.caseColor, -14);
+    document.getElementById('notch-color').value = st.notchColor;
+    document.getElementById('notch-hex').textContent = st.notchColor;
+  }
+  if(st.barAuto){
+    st.barColor = adjustHex(st.caseColor, 18);
+    document.getElementById('bar-color').value = st.barColor;
+    document.getElementById('bar-hex').textContent = st.barColor;
+  }
+}
+
+function setFrame(type, el){
+  pick('frame-group', el);
+  st.frame = type;
+  const isIphone  = type === 'iphone';
+  const isMinimal = type === 'minimal';
+  const hasBorder = isIphone || isMinimal;
+  document.getElementById('f-case').style.display      = isIphone  ? '' : 'none';
+  document.getElementById('f-radius').style.display    = isMinimal ? '' : 'none';
+  document.getElementById('f-border').style.display    = hasBorder ? '' : 'none';
+  document.getElementById('f-bordercol').style.display = hasBorder ? '' : 'none';
+  document.getElementById('shadow-sec').style.display  = type !== 'none' ? '' : 'none';
+  update();
+}
+
+function setSrc(t, idx){
+  st.srcType = t;
+  document.querySelectorAll('#src-seg .seg-btn').forEach((b,i)=>b.classList.toggle('on', i===idx));
+  const lbl = document.getElementById('url-lbl');
+  const inp = document.getElementById('video-url');
+  if(t==='youtube')    { lbl.textContent='YouTube video URL'; inp.placeholder='https://youtu.be/dQw4w9WgXcQ'; }
+  else if(t==='vimeo') { lbl.textContent='Vimeo video URL';   inp.placeholder='https://vimeo.com/123456789'; }
+  else                 { lbl.textContent='Direct video URL (.mp4, .webm)'; inp.placeholder='https://your-video.mp4'; }
+  updateCtrlRow();
+  update();
+}
+
+function toggleShadow(){
+  st.shadow = !st.shadow;
+  document.getElementById('sw-track').classList.toggle('on', st.shadow);
+  document.getElementById('shadow-sliders').style.display = st.shadow ? '' : 'none';
+  update();
+}
+
+function toggleAlwaysShow(){
+  st.alwaysShow = !st.alwaysShow;
+  document.getElementById('sw-always').classList.toggle('on', st.alwaysShow);
+  update();
+}
+
+function updateCtrlRow(){
+  const ctrlOn = st.hoverControls;
+  const isUrl  = st.srcType === 'url';
+  document.getElementById('always-show-field').style.display = (ctrlOn && isUrl) ? '' : 'none';
+  document.getElementById('ctrl-style-field').style.display  = ctrlOn ? '' : 'none';
+}
+
+/* ══════════════════════════════════════
+   PREVIEW / REMOVE BUTTON
+══════════════════════════════════════ */
+function handlePreviewBtn(){
+  if(st.previewed){
+    st.url = '';
+    st.previewed = false;
+    document.getElementById('video-url').value = '';
+    const btn = document.getElementById('prev-btn');
+    btn.textContent = 'Preview';
+    btn.classList.remove('remove');
+    renderPreview(true);
+    renderCode();
+  } else {
+    const raw = document.getElementById('video-url').value.trim();
+    if(!raw) return;
+    st.url = raw;
+    st.previewed = true;
+    const btn = document.getElementById('prev-btn');
+    btn.textContent = 'Remove';
+    btn.classList.add('remove');
+    renderPreview(true);
+    renderCode();
+  }
+}
+
+/* ══════════════════════════════════════
+   MAIN UPDATE
+══════════════════════════════════════ */
+function update(){
+  renderPreview(false);
+  renderCode();
+}
+
+function updateMutePreview(){
+  st.muted = !st.muted;
+  const vid = document.getElementById('vi').querySelector('video');
+  if(vid){
+    vid.muted = st.muted;
+    document.getElementById('pv-mute').innerHTML = iconSvg(st.muted ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor);
+  }
+  renderCode();
+  renderPreview(false);
+}
+
+/* ══════════════════════════════════════
+   EXTRACTORS
+══════════════════════════════════════ */
+function getYouTubeId(url){
+  const shorts = url.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/);
+  if(shorts) return shorts[1];
+  const std = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([A-Za-z0-9_-]{11})/);
+  if(std) return std[1];
+  const raw = url.trim().match(/^[A-Za-z0-9_-]{11}$/);
+  return raw ? raw[0] : url.trim();
+}
+
+function getVimeoId(url){
+  const m = url.match(/vimeo\.com\/(\d+)/);
+  return m ? m[1] : url.replace(/\D/g,'');
+}
+
+/* ══════════════════════════════════════
+   ICON BUILDER (color-aware)
+══════════════════════════════════════ */
+function iconSvg(path, size, color){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${color}"><path d="${path}"/></svg>`;
+}
+
+/* ══════════════════════════════════════
+   PREVIEW RENDERER
+══════════════════════════════════════ */
+function renderPreview(force){
+  const shell  = document.getElementById('phone-shell');
+  const vc     = document.getElementById('vc');
+  const vi     = document.getElementById('vi');
+  const badge  = document.getElementById('brand-badge');
+  const ctrlOv = document.getElementById('ctrl-ov');
+  const pvMute = document.getElementById('pv-mute');
+  const pvPlay = document.getElementById('pv-play');
+
+  shell.querySelectorAll('.ipd').forEach(e=>e.remove());
+
+  const PW = Math.min(st.maxw, 148);
+  const PH = Math.round(PW * 16/9);
+
+  // Reset
+  shell.style.background = shell.style.borderRadius = shell.style.padding = shell.style.border = shell.style.filter = '';
+  vc.style.width = PW+'px';
+  vc.style.height = PH+'px';
+  vc.style.borderRadius = '0';
+  vc.style.border = 'none';
+  vc.style.boxShadow = 'none';
+
+  // Shadow value
+  const shadowVal = `0 ${Math.round(st.shadowBlur*0.5)}px ${st.shadowBlur}px rgba(0,0,0,${(st.shadowOpacity/100).toFixed(2)})`;
+  const shadowFilter = `drop-shadow(0 ${Math.round(st.shadowBlur*0.5)}px ${st.shadowBlur}px rgba(0,0,0,${(st.shadowOpacity/100).toFixed(2)}))`;
+
+  // Frame
+  if(st.frame === 'iphone'){
+    const cc    = st.caseColor || '#1a1a1a';
+    const notch = st.notchColor;
+    const bar   = st.barColor;
+
+    shell.style.background   = cc;
+    shell.style.borderRadius = '28px';
+    shell.style.padding      = '28px 7px 18px';
+    shell.style.border       = `2px solid ${adjustHex(cc,-14)}`;
+    if(st.shadow) shell.style.filter = shadowFilter;
+
+    vc.style.borderRadius = '16px';
+    if(st.borderW>0) vc.style.border = `${st.borderW}px solid ${st.borderColor}`;
+
+    const n = document.createElement('div');
+    n.className = 'ipd';
+    n.style.cssText = `position:absolute;top:8px;left:50%;transform:translateX(-50%);width:46px;height:8px;background:${notch};border-radius:4px;z-index:3;pointer-events:none;`;
+    const b = document.createElement('div');
+    b.className = 'ipd';
+    b.style.cssText = `position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:38px;height:4px;background:${bar};border-radius:2px;z-index:3;pointer-events:none;`;
+    shell.appendChild(n);
+    shell.appendChild(b);
+
+  } else if(st.frame === 'minimal'){
+    vc.style.borderRadius = st.radius+'px';
+    if(st.borderW>0) vc.style.border = `${st.borderW}px solid ${st.borderColor}`;
+    if(st.shadow)    vc.style.boxShadow = shadowVal;
+  }
+
+  // Brand badge
+  const showBadge = st.url && !st.hideSource;
+  badge.style.display = showBadge ? 'block' : 'none';
+  if(showBadge){
+    if(st.srcType === 'youtube'){
+      badge.innerHTML = `<div style="background:#FF0000;border-radius:4px;padding:3px 7px;display:flex;align-items:center;gap:4px;"><svg width="12" height="9" viewBox="0 0 12 9" fill="#fff"><path d="M11.7 1.4S11.5.3 11 0C10.4-.5 9.8-.5 9.5-.5 7.9.1 6 .1 6 .1S4.1.1 2.5-.5C2.2-.5 1.6-.5 1 0 .5.3.3 1.4.3 1.4S.1 2.7.1 4v1c0 1.3.2 2.6.2 2.6S.5 8.7 1 9c.6.5 1.4.5 1.8.5C4.2 9.6 6 9.6 6 9.6s1.9 0 3.5-.5c.3-.1.9-.1 1.5-.5.5-.3.7-1.4.7-1.4s.2-1.3.2-2.6V4c0-1.3-.2-2.6-.2-2.6zM4.8 6.2V2.8l3.2 1.7-3.2 1.7z"/></svg><span style="font-family:'DM Mono',monospace;font-size:7px;color:#fff;letter-spacing:.05em;">YouTube</span></div>`;
+    } else if(st.srcType === 'vimeo'){
+      badge.innerHTML = `<div style="background:#1ab7ea;border-radius:4px;padding:3px 7px;display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fff"><path d="M22.4 6.8c-.1 2.5-1.8 5.9-5.3 10.2-3.6 4.5-6.7 6.7-9.1 6.7-1.5 0-2.8-1.4-3.9-4.3L2.7 12C2 9.1 1.2 7.7.3 7.7l-.3.2L-.8 7c1.3-1.1 2.5-2.2 3.7-3.2 1.7-1.4 2.8-2 3.6-2.1 1.9-.2 3.1 1.1 3.6 3.9.5 2.9.8 4.7 1 5.3.5 2.4 1.1 3.5 1.7 3.5.5 0 1.2-.8 2.2-2.3 1-1.5 1.5-2.7 1.6-3.5.1-1.3-.4-2-1.5-2-.5 0-1.1.1-1.7.4 1.1-3.7 3.3-5.5 6.4-5.3 2.4.1 3.5 1.6 3.6 4.1z"/></svg><span style="font-family:'DM Mono',monospace;font-size:7px;color:#fff;letter-spacing:.05em;">Vimeo</span></div>`;
+    }
+  }
+
+  // Controls overlay
+  const btnBg = hexToRgba(st.ctrlBgColor, st.ctrlBgOpacity);
+  pvMute.style.background = btnBg;
+  pvPlay.style.background = btnBg;
+
+  if(st.hoverControls){
+    ctrlOv.style.display = 'block';
+    ctrlOv.style.pointerEvents = 'none';
+    if(st.alwaysShow && st.srcType === 'url'){
+      ctrlOv.style.opacity = '1';
+    } else {
+      ctrlOv.style.opacity = '';
+    }
+  } else {
+    ctrlOv.style.display = 'none';
+  }
+
+  // Rebuild video content only when forced
+  const hasSrc = vi.querySelector('video,iframe,img');
+  if(!force && hasSrc && st.url) return;
+
+  vi.innerHTML = '';
+  pvMute.onclick = null;
+  pvPlay.onclick  = null;
+  pvMute.style.opacity = '';
+  pvPlay.style.opacity  = '';
+  pvMute.innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
+  pvPlay.innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
+
+  if(!st.url){
+    vi.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)"><path d="M8 5v14l11-7z"/></svg>';
+    return;
+  }
+
+  if(st.srcType === 'youtube'){
+    const ytId = getYouTubeId(st.url);
+    const img = document.createElement('img');
+    img.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    img.onerror = ()=>{ img.style.display='none'; };
+    vi.appendChild(img);
+    pvPlay.style.opacity = '0.5';
+    pvMute.style.opacity = '0.5';
+    pvMute.innerHTML = iconSvg(st.muted ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor);
+    pvPlay.innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
+
+  } else if(st.srcType === 'vimeo'){
+    vi.style.background = '#101010';
+    vi.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><svg width="26" height="26" viewBox="0 0 24 24" fill="rgba(26,183,234,.7)"><path d="M22.4 6.8c-.1 2.5-1.8 5.9-5.3 10.2-3.6 4.5-6.7 6.7-9.1 6.7-1.5 0-2.8-1.4-3.9-4.3L2.7 12C2 9.1 1.2 7.7.3 7.7l-.3.2L-.8 7c1.3-1.1 2.5-2.2 3.7-3.2 1.7-1.4 2.8-2 3.6-2.1 1.9-.2 3.1 1.1 3.6 3.9.5 2.9.8 4.7 1 5.3.5 2.4 1.1 3.5 1.7 3.5.5 0 1.2-.8 2.2-2.3 1-1.5 1.5-2.7 1.6-3.5.1-1.3-.4-2-1.5-2-.5 0-1.1.1-1.7.4 1.1-3.7 3.3-5.5 6.4-5.3 2.4.1 3.5 1.6 3.6 4.1z"/></svg><div style="font-family:'DM Mono',monospace;font-size:7px;color:rgba(255,255,255,0.35);letter-spacing:.06em;">VIMEO PREVIEW</div></div>`;
+    pvPlay.style.opacity = '0.5';
+    pvMute.style.opacity = '0.5';
+    pvMute.innerHTML = iconSvg(st.muted ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor);
+
+  } else {
+    // Direct video — fully functional
+    const vid = document.createElement('video');
+    vid.src = st.url;
+    vid.loop = st.loop;
+    vid.muted = st.muted;
+    if(!st.muted) vid.volume = 1;
+    vid.setAttribute('playsinline','');
+    vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+    vi.appendChild(vid);
+
+    if(st.autoplay){
+      vid.autoplay = true;
+      vid.play().catch(()=>{ vid.muted=true; vid.play().catch(()=>{}); });
+    }
+
+    function syncPlayBtn(){ pvPlay.innerHTML = iconSvg(vid.paused ? SVG.playE : SVG.pauseE, 14, st.ctrlIconColor); }
+    function syncMuteBtn(){ pvMute.innerHTML = iconSvg(vid.muted ? SVG.mutedE : SVG.soundE, 13, st.ctrlIconColor); }
+
+    vid.addEventListener('play', syncPlayBtn);
+    vid.addEventListener('pause', syncPlayBtn);
+
+    pvPlay.onclick = function(e){ e.stopPropagation(); if(vid.paused) vid.play().catch(()=>{}); else vid.pause(); };
+    pvMute.onclick = function(e){ e.stopPropagation(); vid.muted=!vid.muted; syncMuteBtn(); };
+
+    syncPlayBtn(); syncMuteBtn();
+  }
+}
+
+/* ══════════════════════════════════════
+   CODE GENERATOR
+══════════════════════════════════════ */
+function renderCode(){
+  if(!st.url){
+    document.getElementById('code-out').textContent = '<!-- Enter a video URL above and click Preview to generate embed code -->';
+    return;
+  }
+  document.getElementById('code-out').textContent = buildCode();
+}
+
+function buildCode(){
+  const url  = st.url;
+  const cc   = st.caseColor || '#1a1a1a';
+  const dark = adjustHex(cc, -14);
+
+  const shadowOpF  = (st.shadowOpacity/100).toFixed(2);
+  const shadowVal  = `0 ${Math.round(st.shadowBlur*0.5)}px ${st.shadowBlur}px rgba(0,0,0,${shadowOpF})`;
+  const shadowFilt = `drop-shadow(0 ${Math.round(st.shadowBlur*0.5)}px ${st.shadowBlur}px rgba(0,0,0,${shadowOpF}))`;
+
+  /* inner container style */
+  let vcStyle = 'position:relative;aspect-ratio:9/16;overflow:hidden;background:#000;';
+  if(st.frame === 'iphone'){
+    vcStyle += `width:${st.maxw}px;border-radius:16px;`;
+    if(st.borderW>0) vcStyle += `border:${st.borderW}px solid ${st.borderColor};`;
+  } else if(st.frame === 'minimal'){
+    vcStyle += `width:100%;max-width:${st.maxw}px;border-radius:${st.radius}px;`;
+    if(st.borderW>0) vcStyle += `border:${st.borderW}px solid ${st.borderColor};`;
+    if(st.shadow)    vcStyle += `box-shadow:${shadowVal};`;
+  } else {
+    vcStyle += `width:100%;max-width:${st.maxw}px;`;
+  }
+
+  /* iPhone shell */
+  let shellOpen = '', shellClose = '';
+  if(st.frame === 'iphone'){
+    const sf = st.shadow ? `filter:${shadowFilt};` : '';
+    shellOpen = `
+  <div style="display:inline-block;background:${cc};border-radius:28px;padding:28px 7px 18px;position:relative;border:2px solid ${dark};${sf}">
+    <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:46px;height:8px;background:${st.notchColor};border-radius:4px;z-index:3;pointer-events:none;"></div>
+    <div style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:38px;height:4px;background:${st.barColor};border-radius:2px;z-index:3;pointer-events:none;"></div>`;
+    shellClose = `\n  </div>`;
+  }
+
+  /* Controls */
+  const showControls = st.hoverControls;
+  const initMuted    = st.muted;
+  const initPlaying  = st.autoplay;
+  const playPath     = initPlaying ? SVG.pauseE : SVG.playE;
+  const mutePath     = initMuted   ? SVG.mutedE : SVG.soundE;
+  const btnBg        = hexToRgba(st.ctrlBgColor, st.ctrlBgOpacity);
+  const iconCol      = st.ctrlIconColor;
+  const initOpacity  = (st.alwaysShow && st.srcType === 'url') ? '1' : '0';
+
+  const ctrlHTML = showControls ? `
+    <div id="vv-ctrl" style="position:absolute;inset:0;opacity:${initOpacity};transition:opacity 0.2s;z-index:10;pointer-events:auto;cursor:pointer;">
+      <button id="vv-mute" style="position:absolute;top:10px;left:10px;width:36px;height:36px;border-radius:50%;background:${btnBg};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;backdrop-filter:blur(4px);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${mutePath}"/></svg>
+      </button>
+      <button id="vv-play" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:${btnBg};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;pointer-events:auto;backdrop-filter:blur(4px);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${playPath}"/></svg>
+      </button>
+    </div>` : '';
+
+  let mediaEl = '', scriptEl = '';
+
+  if(st.srcType === 'youtube'){
+    const ytId = getYouTubeId(url);
+    const p = ['playsinline=1','rel=0','enablejsapi=1','modestbranding=1','iv_load_policy=3'];
+    if(st.autoplay)   p.push('autoplay=1');
+    if(st.loop)       p.push('loop=1','playlist='+ytId);
+    if(st.muted)      p.push('mute=1');
+    if(st.hideSource) p.push('controls=0','disablekb=1');
+    const ptrEv = showControls ? 'none' : 'auto';
+    mediaEl = `    <iframe id="vv-yt" src="https://www.youtube.com/embed/${ytId}?${p.join('&')}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:${ptrEv};"></iframe>`;
+
+    if(showControls){
+      const alwaysOn = false; // YouTube always hover — can't hold pointer over iframe
+      scriptEl = `
+<script>
+(function(){
+  var outer=document.getElementById('vv-outer');
+  var ctrl=outer.querySelector('#vv-ctrl');
+  var muteBtn=outer.querySelector('#vv-mute');
+  var playBtn=outer.querySelector('#vv-play');
+  if(!ctrl)return;
+  var playing=${initPlaying};var muted=${initMuted};var yt=null;
+  var PLAY='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.playE}"/></svg>';
+  var PAUSE='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.pauseE}"/></svg>';
+  var MUTED_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.mutedE}"/></svg>';
+  var SOUND_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.soundE}"/></svg>';
+  function showC(){ctrl.style.opacity='1';}function hideC(){ctrl.style.opacity='0';}
+  outer.addEventListener('mouseenter',showC);outer.addEventListener('mouseleave',hideC);
+  outer.addEventListener('touchstart',function(){ctrl.style.opacity==='0'?showC():hideC();},{passive:true});
+  function updPlay(){playBtn.innerHTML=playing?PAUSE:PLAY;}
+  function updMute(){muteBtn.innerHTML=muted?MUTED_I:SOUND_I;}
+  function togglePlay(){if(!yt)return;if(playing){yt.pauseVideo();playing=false;}else{yt.playVideo();playing=true;}updPlay();}
+  function toggleMute(){if(!yt)return;if(muted){yt.unMute();muted=false;}else{yt.mute();muted=true;}updMute();}
+  playBtn.addEventListener('click',function(e){e.stopPropagation();togglePlay();});
+  muteBtn.addEventListener('click',function(e){e.stopPropagation();toggleMute();});
+  ctrl.addEventListener('click',function(e){if(e.target===ctrl)togglePlay();});
+  var tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+  var prevCb=window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady=function(){
+    if(prevCb)prevCb();
+    yt=new YT.Player('vv-yt',{events:{onStateChange:function(e){playing=(e.data===YT.PlayerState.PLAYING);updPlay();}}});
+  };
+  updPlay();updMute();
+})();
+<\/script>`;
+    }
+
+  } else if(st.srcType === 'vimeo'){
+    const vmId = getVimeoId(url);
+    const p = ['playsinline=1','dnt=1'];
+    if(st.hideSource) p.push('background=1');
+    if(st.autoplay)   p.push('autoplay=1');
+    if(st.loop)       p.push('loop=1');
+    if(st.muted)      p.push('muted=1');
+    const ptrEv = showControls ? 'none' : 'auto';
+    mediaEl = `    <iframe id="vv-vm" src="https://player.vimeo.com/video/${vmId}?${p.join('&')}" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;pointer-events:${ptrEv};"></iframe>`;
+
+    if(showControls){
+      scriptEl = `
+<script src="https://player.vimeo.com/api/player.js"><\/script>
+<script>
+(function(){
+  var outer=document.getElementById('vv-outer');
+  var ctrl=outer.querySelector('#vv-ctrl');
+  var muteBtn=outer.querySelector('#vv-mute');
+  var playBtn=outer.querySelector('#vv-play');
+  if(!ctrl)return;
+  var playing=${initPlaying};var muted=${initMuted};var vm=null;
+  var PLAY='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.playE}"/></svg>';
+  var PAUSE='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.pauseE}"/></svg>';
+  var MUTED_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.mutedE}"/></svg>';
+  var SOUND_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.soundE}"/></svg>';
+  function showC(){ctrl.style.opacity='1';}function hideC(){ctrl.style.opacity='0';}
+  outer.addEventListener('mouseenter',showC);outer.addEventListener('mouseleave',hideC);
+  outer.addEventListener('touchstart',function(){ctrl.style.opacity==='0'?showC():hideC();},{passive:true});
+  function updPlay(){playBtn.innerHTML=playing?PAUSE:PLAY;}
+  function updMute(){muteBtn.innerHTML=muted?MUTED_I:SOUND_I;}
+  function togglePlay(){if(!vm)return;if(playing)vm.pause();else vm.play();}
+  function toggleMute(){if(!vm)return;muted=!muted;vm.setMuted(muted);updMute();}
+  playBtn.addEventListener('click',function(e){e.stopPropagation();togglePlay();});
+  muteBtn.addEventListener('click',function(e){e.stopPropagation();toggleMute();});
+  ctrl.addEventListener('click',function(e){if(e.target===ctrl)togglePlay();});
+  function initVM(){vm=new Vimeo.Player(outer.querySelector('#vv-vm'));vm.on('play',function(){playing=true;updPlay();});vm.on('pause',function(){playing=false;updPlay();});}
+  function tryInit(){if(window.Vimeo){initVM();}else{setTimeout(tryInit,50);}}
+  tryInit();updPlay();updMute();
+})();
+<\/script>`;
+    }
+
+  } else {
+    // Direct video
+    const attrs = ['playsinline','id="vv-vid"'];
+    if(st.autoplay) attrs.push('autoplay');
+    if(st.loop)     attrs.push('loop');
+    if(st.muted)    attrs.push('muted');
+    mediaEl = `    <video src="${url}" ${attrs.join(' ')} style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></video>`;
+
+    if(showControls){
+      const alwaysOn = st.alwaysShow;
+      scriptEl = `
+<script>
+(function(){
+  var outer=document.getElementById('vv-outer');
+  var vid=outer.querySelector('#vv-vid');
+  var ctrl=outer.querySelector('#vv-ctrl');
+  var muteBtn=outer.querySelector('#vv-mute');
+  var playBtn=outer.querySelector('#vv-play');
+  if(!vid||!ctrl)return;
+  var PLAY='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.playE}"/></svg>';
+  var PAUSE='<svg width="16" height="16" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.pauseE}"/></svg>';
+  var MUTED_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.mutedE}"/></svg>';
+  var SOUND_I='<svg width="14" height="14" viewBox="0 0 24 24" fill="${iconCol}"><path d="${SVG.soundE}"/></svg>';
+  ${alwaysOn ? '' : `function showC(){ctrl.style.opacity='1';}function hideC(){ctrl.style.opacity='0';}
+  outer.addEventListener('mouseenter',showC);outer.addEventListener('mouseleave',hideC);
+  outer.addEventListener('touchstart',function(){ctrl.style.opacity==='0'?showC():hideC();},{passive:true});`}
+  function updPlay(){playBtn.innerHTML=vid.paused?PLAY:PAUSE;}
+  function updMute(){muteBtn.innerHTML=vid.muted?MUTED_I:SOUND_I;}
+  vid.addEventListener('play',updPlay);vid.addEventListener('pause',updPlay);
+  function togglePlay(){if(vid.paused)vid.play();else vid.pause();}
+  function toggleMute(){vid.muted=!vid.muted;updMute();}
+  playBtn.addEventListener('click',function(e){e.stopPropagation();togglePlay();});
+  muteBtn.addEventListener('click',function(e){e.stopPropagation();toggleMute();});
+  ctrl.addEventListener('click',function(e){if(e.target===ctrl)togglePlay();});
+  updPlay();updMute();
+})();
+<\/script>`;
+    }
+  }
+
+  const code = `<!-- Vertical Video Embed -->
+<div style="display:flex;justify-content:center;padding:1rem 0;">${shellOpen}
+  <div id="vv-outer" style="${vcStyle}">${ctrlHTML}
+${mediaEl}
+  </div>${shellClose}
+</div>${scriptEl}`;
+
+  return code;
+}
+
+/* ══════════════════════════════════════
+   COPY
+══════════════════════════════════════ */
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('code-out').textContent).then(()=>{
+    const b = document.getElementById('copy-btn');
+    b.textContent = 'Copied!'; b.classList.add('ok');
+    setTimeout(()=>{ b.textContent='Copy Code'; b.classList.remove('ok'); }, 2200);
+  });
+}
+
+/* ══════════════════════════════════════
+   TOOLTIPS (fixed positioning — escapes overflow clipping)
+══════════════════════════════════════ */
+(function(){
+  const tip = document.getElementById('float-tip');
+  let hideTimer;
+
+  function showTip(el){
+    clearTimeout(hideTimer);
+    tip.textContent = el.dataset.tip;
+    tip.style.display = 'block';
+    const r = el.getBoundingClientRect();
+    // Position below for faq-tip, above for info-icon
+    const isInfo = el.classList.contains('info-icon');
+    if(isInfo){
+      tip.style.width = '210px';
+      let left = r.left + r.width/2 - 105;
+      left = Math.max(8, Math.min(left, window.innerWidth - 218));
+      tip.style.left = left+'px';
+      tip.style.top = (r.top - tip.offsetHeight - 8 + window.scrollY)+'px';
+    } else {
+      tip.style.width = '240px';
+      let left = r.right - 240;
+      left = Math.max(8, Math.min(left, window.innerWidth - 248));
+      tip.style.left = left+'px';
+      tip.style.top = (r.bottom + 6 + window.scrollY)+'px';
+    }
+  }
+
+  function hideTip(){
+    hideTimer = setTimeout(()=>{ tip.style.display='none'; }, 80);
+  }
+
+  document.querySelectorAll('[data-tip]').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>showTip(el));
+    el.addEventListener('mouseleave', hideTip);
+  });
+})();
+
+
+document.getElementById('pv-mute').innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
+document.getElementById('pv-play').innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
+update();
+</script>
+</body>
+</html>
