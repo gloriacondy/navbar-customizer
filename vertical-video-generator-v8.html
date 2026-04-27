@@ -13,28 +13,25 @@ html,body{background:#fff;font-family:'Manrope',sans-serif;font-size:12px;color:
 @media(max-width:640px){.cols{flex-direction:column;}}
 
 /* Left pane */
-.settings{flex:1;min-width:0;background:#eef0f3;padding:16px 20px;border-right:1px solid #d0d3d8;display:flex;flex-direction:column;gap:12px;}
+.settings{flex:1;min-width:0;background:#fff;padding:16px 20px;border-right:1px solid #d0d3d8;display:flex;flex-direction:column;gap:12px;}
 
 /* Section cards */
-.sec{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:hidden;}
-.sec-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;display:flex;align-items:center;justify-content:space-between;}
-.sec-body{padding:12px;background:#fff;}
+.sec{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:visible;}
+.sec-hd{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#999;padding:7px 12px;background:#f5f6f8;border-bottom:1px solid #d0d3d8;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;position:relative;}
+.sec-body{padding:12px;background:#fff;border-radius:0 0 8px 8px;}
 .field{margin-bottom:10px;}
 .field:last-child{margin-bottom:0;}
 .lbl{font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;color:#444;margin-bottom:5px;display:block;}
 
-/* FAQ tooltip in header */
-.faq-tip{font-family:'Manrope',sans-serif;font-size:9px;font-style:italic;color:#bbb;cursor:default;position:relative;white-space:nowrap;}
-.faq-tip .tip-box{display:none;position:absolute;right:0;top:calc(100% + 6px);width:230px;background:#1e1e1e;color:#ccc;font-style:normal;font-size:10px;line-height:1.5;padding:10px 12px;border-radius:7px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none;}
-.faq-tip .tip-box::before{content:'';position:absolute;top:-5px;right:12px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #1e1e1e;}
-.faq-tip:hover .tip-box{display:block;}
+/* FAQ tooltip trigger */
+.faq-tip{font-family:'Manrope',sans-serif;font-size:9px;font-style:italic;color:#bbb;cursor:default;white-space:nowrap;}
 
 /* Branding tooltip */
-.info-wrap{position:relative;display:inline-flex;align-items:center;}
+.info-wrap{display:inline-flex;align-items:center;}
 .info-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#e0e0e0;color:#888;font-size:8px;font-family:'DM Mono',monospace;cursor:default;margin-left:5px;flex-shrink:0;}
-.info-icon .tip-box{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 6px);width:210px;background:#1e1e1e;color:#ccc;font-style:normal;font-size:10px;line-height:1.5;padding:10px 12px;border-radius:7px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none;white-space:normal;}
-.info-icon .tip-box::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #1e1e1e;}
-.info-icon:hover .tip-box{display:block;}
+
+/* Shared floating tooltip */
+#float-tip{position:fixed;z-index:9999;width:220px;background:#1e1e1e;color:#ccc;font-family:'Manrope',sans-serif;font-size:10px;line-height:1.5;padding:10px 12px;border-radius:7px;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:none;display:none;}
 
 /* URL row */
 .url-row{display:flex;gap:6px;align-items:stretch;}
@@ -115,6 +112,7 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
+<div id="float-tip"></div>
 <div class="app">
   <div class="cols">
 
@@ -125,9 +123,7 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
       <div class="sec">
         <div class="sec-hd">
           <span>Video Source</span>
-          <span class="faq-tip">Why no TikTok or Instagram?
-            <div class="tip-box">TikTok and Instagram actively block third-party embedding — their players either refuse to load, strip the video down to a broken shell, or violate platform terms of service. This tool is designed to be lean and honest: it gives you a clean, no-storage embed solution that works reliably. For best results, use a direct video URL (.mp4 or .webm), or upload your video to YouTube or Vimeo and embed from there.</div>
-          </span>
+          <span class="faq-tip" data-tip="TikTok and Instagram actively block third-party embedding — their players either refuse to load, strip the video down to a broken shell, or violate platform terms of service. This tool is lean and honest: it gives you a clean, no-storage embed solution that works reliably. For best results, use a direct video URL (.mp4 or .webm), or upload your content to YouTube or Vimeo and embed from there.">Why no TikTok or Instagram? &#9660;</span>
         </div>
         <div class="sec-body">
           <div class="field">
@@ -259,9 +255,7 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
               <button class="tpill on" id="tp-muted"    onclick="togglePill('tp-muted');st.muted=!st.muted;updateMutePreview()">Muted</button>
               <div class="info-wrap">
                 <button class="tpill on" id="tp-hide" onclick="togglePill('tp-hide');st.hideSource=!st.hideSource;update()">Hide Branding</button>
-                <span class="info-icon">i
-                  <div class="tip-box">YouTube and Vimeo may still briefly show their logo on load or hover. This setting removes controls and watermarks where the embed API allows, but full branding suppression isn't guaranteed.</div>
-                </span>
+                <span class="info-icon" data-tip="YouTube and Vimeo may still briefly show their logo on load or hover. This setting removes controls and watermarks where the embed API allows, but full branding suppression isn't guaranteed.">i</span>
               </div>
               <button class="tpill on" id="tp-ctrl" onclick="togglePill('tp-ctrl');st.hoverControls=!st.hoverControls;updateCtrlRow();update()">Controls for Viewers</button>
             </div>
@@ -897,8 +891,45 @@ function copyCode(){
 }
 
 /* ══════════════════════════════════════
-   INIT
+   TOOLTIPS (fixed positioning — escapes overflow clipping)
 ══════════════════════════════════════ */
+(function(){
+  const tip = document.getElementById('float-tip');
+  let hideTimer;
+
+  function showTip(el){
+    clearTimeout(hideTimer);
+    tip.textContent = el.dataset.tip;
+    tip.style.display = 'block';
+    const r = el.getBoundingClientRect();
+    // Position below for faq-tip, above for info-icon
+    const isInfo = el.classList.contains('info-icon');
+    if(isInfo){
+      tip.style.width = '210px';
+      let left = r.left + r.width/2 - 105;
+      left = Math.max(8, Math.min(left, window.innerWidth - 218));
+      tip.style.left = left+'px';
+      tip.style.top = (r.top - tip.offsetHeight - 8 + window.scrollY)+'px';
+    } else {
+      tip.style.width = '240px';
+      let left = r.right - 240;
+      left = Math.max(8, Math.min(left, window.innerWidth - 248));
+      tip.style.left = left+'px';
+      tip.style.top = (r.bottom + 6 + window.scrollY)+'px';
+    }
+  }
+
+  function hideTip(){
+    hideTimer = setTimeout(()=>{ tip.style.display='none'; }, 80);
+  }
+
+  document.querySelectorAll('[data-tip]').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>showTip(el));
+    el.addEventListener('mouseleave', hideTip);
+  });
+})();
+
+
 document.getElementById('pv-mute').innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
 document.getElementById('pv-play').innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
 update();
