@@ -107,6 +107,8 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
 .copy-btn:hover{background:#444;}
 .copy-btn.ok{background:#1D9E75;}
 
+.tpill.locked{opacity:0.45;cursor:not-allowed;}
+
 /* Preview control buttons */
 .pctrl{position:absolute;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(2px);}
 </style>
@@ -250,15 +252,18 @@ input[type="color"]{width:26px;height:24px;border-radius:4px;border:1px solid #c
           <div class="field">
             <label class="lbl">Options — click to toggle on/off</label>
             <div class="tpill-group">
-              <button class="tpill on" id="tp-autoplay" onclick="togglePill('tp-autoplay');st.autoplay=!st.autoplay;update()">Autoplay</button>
+              <button class="tpill on" id="tp-autoplay" onclick="togglePill('tp-autoplay');st.autoplay=!st.autoplay;syncMuteLock();update()">Autoplay</button>
               <button class="tpill on" id="tp-loop"     onclick="togglePill('tp-loop');st.loop=!st.loop;update()">Loop</button>
-              <button class="tpill on" id="tp-muted"    onclick="togglePill('tp-muted');st.muted=!st.muted;updateMutePreview()">Muted</button>
+              <button class="tpill on" id="tp-muted"    onclick="handleMutedClick()">Muted</button>
               <div class="info-wrap">
                 <button class="tpill on" id="tp-hide" onclick="togglePill('tp-hide');st.hideSource=!st.hideSource;update()">Hide Branding</button>
                 <span class="info-icon" data-tip="YouTube and Vimeo may still briefly show their logo on load or hover. This setting removes controls and watermarks where the embed API allows, but full branding suppression isn't guaranteed.">i</span>
               </div>
               <button class="tpill on" id="tp-ctrl" onclick="togglePill('tp-ctrl');st.hoverControls=!st.hoverControls;updateCtrlRow();update()">Controls for Viewers</button>
             </div>
+          </div>
+          <div id="autoplay-mute-note" style="display:none;margin-top:6px;font-family:'Manrope',sans-serif;font-size:10px;color:#aaa;line-height:1.4;">
+            Browsers require autoplay videos to start muted. Add <em>Controls for Viewers</em> so visitors can unmute.
           </div>
           <!-- Always-show toggle: visible only when Controls for Viewers is ON and srcType is url -->
           <div class="field" id="always-show-field" style="display:none;margin-top:10px;">
@@ -445,6 +450,31 @@ function toggleAlwaysShow(){
   document.getElementById('sw-always').classList.toggle('on', st.alwaysShow);
   update();
 }
+
+function syncMuteLock(){
+  const pill = document.getElementById('tp-muted');
+  const note = document.getElementById('autoplay-mute-note');
+  if(st.autoplay){
+    // Force muted on, lock the pill
+    st.muted = true;
+    pill.classList.add('on','locked');
+    note.style.display = '';
+  } else {
+    pill.classList.remove('locked');
+    note.style.display = 'none';
+  }
+  // Sync video element if present
+  const vid = document.getElementById('vi').querySelector('video');
+  if(vid) vid.muted = st.muted;
+}
+
+function handleMutedClick(){
+  if(st.autoplay) return; // locked — do nothing
+  st.muted = !st.muted;
+  document.getElementById('tp-muted').classList.toggle('on', st.muted);
+  updateMutePreview();
+}
+
 
 function updateCtrlRow(){
   const ctrlOn = st.hoverControls;
@@ -972,6 +1002,7 @@ function fallbackCopy(text, cb){
 document.getElementById('pv-mute').innerHTML = iconSvg(SVG.mutedE, 13, st.ctrlIconColor);
 document.getElementById('pv-play').innerHTML  = iconSvg(SVG.playE, 14, st.ctrlIconColor);
 updateCtrlRow();
+syncMuteLock();
 update();
 </script>
 </body>
