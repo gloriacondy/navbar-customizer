@@ -1,8 +1,7 @@
-
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222}
+html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222;height:fit-content;overflow:hidden}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0}
 .card{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:visible}
 .card-head{background:#f5f6f8;padding:7px 12px;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#999;border-bottom:1px solid #d0d3d8;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between}
@@ -568,4 +567,11 @@ function fb(text,cb){
 }
 
 renderColors();positionTips();sizeCanvases();regenerateSeedTrail();update();
+</script>
+
+<script>
+function reportHeight(){window.parent.postMessage({iframeHeight:document.body.scrollHeight},'*');}
+window.addEventListener('load',reportHeight);
+window.addEventListener('resize',reportHeight);
+setInterval(reportHeight,500);
 </script>
