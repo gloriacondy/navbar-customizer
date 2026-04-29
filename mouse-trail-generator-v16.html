@@ -4,7 +4,8 @@
 html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222}
 body{padding:0 2px 8px}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0;min-width:0}
-@media(max-width:640px){.wrap{grid-template-columns:1fr}.row .field-label{min-width:90px}}
+.wrap.stacked{grid-template-columns:1fr}
+.wrap.stacked .row .field-label{min-width:90px}
 .card{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:visible}
 .card-head{background:#f5f6f8;padding:7px 12px;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#999;border-bottom:1px solid #d0d3d8;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between}
 .card-body{padding:12px}
@@ -572,17 +573,20 @@ renderColors();positionTips();sizeCanvases();regenerateSeedTrail();update();
 </script>
 
 <script>
+const _wrap=document.querySelector('.wrap');
+function checkLayout(){
+  if(!_wrap)return;
+  _wrap.classList.toggle('stacked',_wrap.offsetWidth<720);
+}
 function reportHeight(){
-  const wrap=document.querySelector('.wrap');
-  const h=wrap?(wrap.getBoundingClientRect().bottom+24):document.documentElement.scrollHeight;
+  checkLayout();
+  const h=_wrap?(_wrap.getBoundingClientRect().bottom+24):document.documentElement.scrollHeight;
   window.parent.postMessage({iframeHeight:Math.ceil(h)},'*');
 }
-// Fire on load, resize, and whenever the DOM changes size
 window.addEventListener('load',reportHeight);
 window.addEventListener('resize',reportHeight);
 if(window.ResizeObserver){
-  new ResizeObserver(reportHeight).observe(document.querySelector('.wrap')||document.body);
+  new ResizeObserver(reportHeight).observe(_wrap||document.body);
 }
-// Fallback polling
 setInterval(reportHeight,300);
 </script>
