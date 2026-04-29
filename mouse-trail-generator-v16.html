@@ -1,7 +1,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222;height:auto;min-height:0}
+html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222;overflow:visible}
 body{padding:0 2px 16px}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0;min-width:0}
 .wrap.stacked{grid-template-columns:1fr}
@@ -580,15 +580,16 @@ function checkLayout(){
 }
 function reportHeight(){
   checkLayout();
-  // Give layout a moment to settle after stacking/unstacking
   setTimeout(function(){
-    const h=Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight,
-      _wrap?(_wrap.getBoundingClientRect().bottom+40):0
-    );
+    // Measure the true bottom of all content
+    var bottom=0;
+    document.querySelectorAll('.wrap > *').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      if(r.bottom>bottom)bottom=r.bottom;
+    });
+    var h=bottom+window.scrollY+24;
     window.parent.postMessage({iframeHeight:Math.ceil(h)},'*');
-  },50);
+  },100);
 }
 window.addEventListener('load',reportHeight);
 window.addEventListener('resize',reportHeight);
