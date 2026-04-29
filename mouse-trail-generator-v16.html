@@ -1,8 +1,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222}
-body{padding:0 2px 8px}
+html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222;height:auto;min-height:0}
+body{padding:0 2px 16px}
 .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0;min-width:0}
 .wrap.stacked{grid-template-columns:1fr}
 .wrap.stacked .row .field-label{min-width:90px}
@@ -580,8 +580,15 @@ function checkLayout(){
 }
 function reportHeight(){
   checkLayout();
-  const h=_wrap?(_wrap.getBoundingClientRect().bottom+24):document.documentElement.scrollHeight;
-  window.parent.postMessage({iframeHeight:Math.ceil(h)},'*');
+  // Give layout a moment to settle after stacking/unstacking
+  setTimeout(function(){
+    const h=Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight,
+      _wrap?(_wrap.getBoundingClientRect().bottom+40):0
+    );
+    window.parent.postMessage({iframeHeight:Math.ceil(h)},'*');
+  },50);
 }
 window.addEventListener('load',reportHeight);
 window.addEventListener('resize',reportHeight);
