@@ -82,10 +82,11 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
           <input type="text" id="cursorUrl" placeholder="https://your-cursor.png" oninput="onCursorUrlChange()">
           <button class="url-clear" onclick="clearAndRun('cursorUrl',onCursorUrlChange)">×</button>
         </div>
-        <span class="field-label" style="margin-bottom:6px">Cursor colour<span class="has-tip"><span class="tip-icon">i</span><span class="tip-box"><strong>Cursor colour</strong><br>Colour tinting is only available when an SVG cursor URL is provided. PNG images cannot be recoloured this way.</span></span></span>
-        <div id="cursorColorUnavailable" style="margin-bottom:10px"><span style="font-family:'DM Mono',monospace;font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:.06em">Add an SVG URL above to enable</span></div>
-        <div id="cursorSvgColorRow" style="display:none;margin-bottom:10px">
-          <div class="row" style="margin-bottom:0"><span class="field-label">SVG fill colour</span><input type="color" id="cursorSvgColor" value="#222222" oninput="rebuildCursorSvg()"></div>
+        <span class="field-label" style="margin-bottom:6px">Cursor colour tint</span>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+          <input type="color" id="cursorSvgColor" value="#222222" oninput="rebuildCursorSvg()">
+          <button class="url-clear" onclick="resetCursorColor()" title="Remove tint">×</button>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:#aaa" id="cursorColorNote">no tint</span>
         </div>
         <hr class="sub-divider">
         <div class="row" style="margin-bottom:10px"><span class="field-label">Cursor size</span><input type="range" id="cursorSize" min="12" max="80" value="28" step="1" oninput="syncOut(this,'cursorSizeOut')"><span class="val" id="cursorSizeOut">28</span></div>
@@ -370,25 +371,45 @@ preview.addEventListener('mousemove',e=>{
   }
 });
 
+let cursorTintOn=false;
+function resetCursorColor(){
+  cursorTintOn=false;
+  document.getElementById('cursorColorNote').textContent='no tint';
+  rebuildCursorSvg();
+}
 function onCursorUrlChange(){
   const url=gs('cursorUrl');
   usingCursorSvg=url.length>0&&url.toLowerCase().includes('.svg');
-  document.getElementById('cursorSvgColorRow').style.display=usingCursorSvg?'block':'none';
-  document.getElementById('cursorColorUnavailable').style.display=usingCursorSvg?'none':'block';
   cursorImgEl=null;
-  if(url){
-    if(usingCursorSvg){rebuildCursorSvg();return;}
-    const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{cursorImgEl=img;};img.src=url;
-  }
+  if(url){rebuildCursorSvg();return;}
   update();
 }
 function rebuildCursorSvg(){
   const url=gs('cursorUrl'),color=document.getElementById('cursorSvgColor').value;
-  fetch(url).then(r=>r.text()).then(t=>{
-    const svg=t.replace(/fill="[^"]*"/g,`fill="${color}"`).replace(/fill:[^;}"']*/g,`fill:${color}`);
-    const img=new Image();img.onload=()=>{cursorImgEl=img;};
-    img.src=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
-  }).catch(()=>{});update();
+  const note=document.getElementById('cursorColorNote');
+  if(!url){cursorImgEl=null;update();return;}
+  // Mark tint as on whenever color picker is used
+  if(document.activeElement===document.getElementById('cursorSvgColor')){
+    cursorTintOn=true;
+    note.textContent=color;
+  }
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=()=>{
+    if(cursorTintOn){
+      const c=document.createElement('canvas');c.width=img.width||64;c.height=img.height||64;
+      const x=c.getContext('2d');
+      x.drawImage(img,0,0,c.width,c.height);
+      x.globalCompositeOperation='source-in';
+      x.fillStyle=color;
+      x.fillRect(0,0,c.width,c.height);
+      const out=new Image();out.onload=()=>{cursorImgEl=out;};out.src=c.toDataURL();
+    } else {
+      cursorImgEl=img;
+    }
+  };
+  img.onerror=()=>{const fb=new Image();fb.onload=()=>{cursorImgEl=fb;};fb.src=url;};
+  img.src=url+(url.includes('?')?'&':'?')+'_t='+Date.now();
+  update();
 }
 function onTrailUrlChange(){
   const url=gs('trailUrl');
@@ -455,6 +476,7 @@ function generateCode(){
   const trailUrl=gs('trailUrl'),curUrl=gs('cursorUrl'),rawSel=gs('blockId');
   const sh=usingTrailImage?'image':shape;
   const svgC=usingTrailSvg?`'${document.getElementById('trailSvgColor').value}'`:'null';
+  const curSvgC=cursorTintOn?`'${document.getElementById('cursorSvgColor').value}'`:'null';
   const staticRot=(gv('cursorStaticRot')*Math.PI/180).toFixed(4);
   const isSection=scope==='section'&&rawSel;
   const isPlainId=isSection&&/^[a-zA-Z0-9_-]+$/.test(rawSel)&&!rawSel.includes('[');
@@ -470,7 +492,7 @@ const COLORS=${cols};
 const COUNT=${count},SIZE=${size},SPACING=${spacing},MAX_OP=${fadeOp},SCATTER=${scatter};
 const FADE_DUR=${fadeDur},SHAPE='${sh}',FOLLOW=${followMove},SPIN=${spinOn};
 const TRAIL_URL=${trailUrl?`'${trailUrl}'`:'null'},SVG_COL=${svgC};
-const CUR_URL=${curUrl?`'${curUrl}'`:'null'},CUR_SIZE=${cursorSize};
+const CUR_URL=${curUrl?`'${curUrl}'`:'null'},CUR_SIZE=${cursorSize},CUR_SVG_COL=${curSvgC};
 const STATIC_ROT=${staticRot},CUR_FOLLOW=${cursorFollowOn};
 const SCOPE_SEL=${isSection?`'${rawSel.replace(/'/g,"\\'")}'`:'null'};
 
@@ -486,7 +508,19 @@ if(TRAIL_URL){
   if(SVG_COL){fetch(TRAIL_URL).then(r=>r.text()).then(t=>{const s=t.replace(/fill="[^"]*"/g,'fill="'+SVG_COL+'"');trailImg=Object.assign(new Image(),{src:URL.createObjectURL(new Blob([s],{type:'image/svg+xml'}))});});}
   else trailImg=Object.assign(new Image(),{src:TRAIL_URL});
 }
-let curImg=CUR_URL?Object.assign(new Image(),{src:CUR_URL}):null;
+let curImg=null;
+if(CUR_URL){
+  const _ci=new Image();_ci.crossOrigin='anonymous';
+  _ci.onload=()=>{
+    if(CUR_SVG_COL){
+      const _c=document.createElement('canvas');_c.width=_ci.width||64;_c.height=_ci.height||64;
+      const _x=_c.getContext('2d');_x.drawImage(_ci,0,0,_c.width,_c.height);
+      _x.globalCompositeOperation='source-in';_x.fillStyle=CUR_SVG_COL;_x.fillRect(0,0,_c.width,_c.height);
+      curImg=new Image();curImg.src=_c.toDataURL();
+    } else curImg=_ci;
+  };
+  _ci.src=CUR_URL;
+}
 
 let pts=[],spinOff=0,lastAng=0,lastX=-9999,lastY=-9999;
 let curX=innerWidth/2,curY=innerHeight/2,curAng=0,lastCX=-9999,lastCY=-9999;
