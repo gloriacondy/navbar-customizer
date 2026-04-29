@@ -1,14 +1,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222;height:fit-content;overflow:hidden}
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0}
+html,body{font-family:'Manrope',sans-serif;font-weight:400;background:#fff;color:#222}
+body{padding:0 2px 8px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:1rem 0;min-width:0}
+@media(max-width:640px){.wrap{grid-template-columns:1fr}.row .field-label{min-width:90px}}
 .card{background:#fff;border:1px solid #d0d3d8;border-radius:8px;overflow:visible}
 .card-head{background:#f5f6f8;padding:7px 12px;font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#999;border-bottom:1px solid #d0d3d8;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between}
 .card-body{padding:12px}
 .field-label{font-family:'Manrope',sans-serif;font-size:11px;font-weight:500;color:#444;margin-bottom:5px;display:block}
 .row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.row .field-label{min-width:118px;margin-bottom:0;white-space:nowrap;flex-shrink:0}
+.row .field-label{min-width:100px;max-width:130px;margin-bottom:0;white-space:nowrap;flex-shrink:0}
 .val{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;min-width:34px;text-align:right;flex-shrink:0}
 input[type=text]{font-family:'Manrope',sans-serif;font-weight:400;font-size:12px;color:#111;border:1px solid #b0b4bb;border-radius:5px;padding:5px 8px;outline:none;background:#fff;width:100%}
 input[type=text]::placeholder{color:#bbb}
@@ -572,10 +574,15 @@ renderColors();positionTips();sizeCanvases();regenerateSeedTrail();update();
 <script>
 function reportHeight(){
   const wrap=document.querySelector('.wrap');
-  const h=wrap?wrap.getBoundingClientRect().bottom+20:document.body.scrollHeight;
-  window.parent.postMessage({iframeHeight:h},'*');
+  const h=wrap?(wrap.getBoundingClientRect().bottom+24):document.documentElement.scrollHeight;
+  window.parent.postMessage({iframeHeight:Math.ceil(h)},'*');
 }
+// Fire on load, resize, and whenever the DOM changes size
 window.addEventListener('load',reportHeight);
 window.addEventListener('resize',reportHeight);
-setInterval(reportHeight,500);
+if(window.ResizeObserver){
+  new ResizeObserver(reportHeight).observe(document.querySelector('.wrap')||document.body);
+}
+// Fallback polling
+setInterval(reportHeight,300);
 </script>
