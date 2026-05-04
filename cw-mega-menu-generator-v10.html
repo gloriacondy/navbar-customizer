@@ -1287,5 +1287,28 @@ renderNI();
 renderRSI();
 u();
 </script>
+
+<script>
+(function(){
+  function sendHeight(){
+    var h = document.documentElement.scrollHeight;
+    window.parent.postMessage({iframeHeight: h}, '*');
+  }
+  /* Fire immediately, after fonts/layout settle, and on any resize */
+  sendHeight();
+  setTimeout(sendHeight, 100);
+  setTimeout(sendHeight, 400);
+  setTimeout(sendHeight, 1000);
+  window.addEventListener('resize', sendHeight);
+  /* Watch the entire document for any size change */
+  if(window.ResizeObserver){
+    new ResizeObserver(sendHeight).observe(document.documentElement);
+  }
+  /* Also re-send whenever user interacts (accordion open/close changes height) */
+  document.addEventListener('click', function(){ setTimeout(sendHeight, 120); });
+  document.addEventListener('change', function(){ setTimeout(sendHeight, 120); });
+  document.addEventListener('input',  function(){ setTimeout(sendHeight, 120); });
+})();
+</script>
 </body>
 </html>
