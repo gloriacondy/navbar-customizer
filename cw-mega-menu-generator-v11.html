@@ -7,9 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&family=DM+Sans:wght@400;500&family=Inter:wght@400;500&family=Playfair+Display:wght@400;500;700&family=Space+Grotesk:wght@400;500&family=Lora:wght@400;500;600&family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'Manrope',sans-serif;background:#ffffff;color:#222;min-height:100vh}
-body{padding:16px}
-.app-shell{background:#fff;border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;display:grid;grid-template-columns:500px 1fr;min-height:calc(100vh - 32px)}
+html,body{font-family:'Manrope',sans-serif;background:#ffffff;color:#222;height:100vh;overflow:hidden}
+body{padding:16px;height:100vh;overflow:hidden;box-sizing:border-box}
+.app-shell{background:#fff;border:1px solid #d0d3d8;border-radius:12px;overflow:hidden;display:grid;grid-template-columns:500px 1fr;height:calc(100vh - 32px);max-height:calc(100vh - 32px)}
 
 /* LEFT */
 .lp{border-right:1px solid #d0d3d8;display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
@@ -1291,23 +1291,17 @@ u();
 <script>
 (function(){
   function sendHeight(){
-    var h = document.documentElement.scrollHeight;
+    /* The generator is a fixed-height app — report viewport height, not scroll height */
+    var h = window.innerHeight;
     window.parent.postMessage({iframeHeight: h}, '*');
   }
-  /* Fire immediately, after fonts/layout settle, and on any resize */
-  sendHeight();
-  setTimeout(sendHeight, 100);
-  setTimeout(sendHeight, 400);
-  setTimeout(sendHeight, 1000);
-  window.addEventListener('resize', sendHeight);
-  /* Watch the entire document for any size change */
-  if(window.ResizeObserver){
-    new ResizeObserver(sendHeight).observe(document.documentElement);
+  /* Single clean fire after fonts settle */
+  if(document.readyState === 'complete'){
+    sendHeight();
+  } else {
+    window.addEventListener('load', sendHeight);
   }
-  /* Also re-send whenever user interacts (accordion open/close changes height) */
-  document.addEventListener('click', function(){ setTimeout(sendHeight, 120); });
-  document.addEventListener('change', function(){ setTimeout(sendHeight, 120); });
-  document.addEventListener('input',  function(){ setTimeout(sendHeight, 120); });
+  window.addEventListener('resize', sendHeight);
 })();
 </script>
 </body>
